@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Espace admin — Askamore Photography</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Jost:ital,wght@0,300;0,400;0,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="admin-body" data-page="admin">
+
+  <!-- ==================== Connexion ==================== -->
+  <div class="admin-login" id="admin-login">
+    <div class="login-card">
+      <span class="brand">Askamore <em>Photography</em></span>
+      <p class="sub">Espace admin</p>
+      <form id="login-form">
+        <div class="field field--dark">
+          <label for="login-pass">Mot de passe</label>
+          <input type="password" id="login-pass" required autocomplete="current-password">
+        </div>
+        <button class="btn btn--solid" type="submit" style="width:100%">Se connecter</button>
+        <p class="login-error" id="login-error"></p>
+      </form>
+      <a class="login-back" href="index.html">← Retour au site</a>
+    </div>
+  </div>
+
+  <!-- ==================== Tableau de bord ==================== -->
+  <div class="admin-shell" id="admin-shell">
+    <header class="admin-header">
+      <span class="brand">Askamore <em>Admin</em></span>
+      <div class="actions">
+        <a class="btn btn--ghost btn--sm" href="index.html">Voir le site</a>
+        <button class="btn btn--ghost btn--sm" id="btn-logout" type="button">Se déconnecter</button>
+      </div>
+    </header>
+
+    <div class="admin-layout">
+      <nav class="admin-nav" aria-label="Sections de l'administration">
+        <p class="group">Page d'accueil</p>
+        <button data-tab="about" class="active" type="button">À propos — photo</button>
+        <p class="group">Galeries</p>
+        <button data-tab="mariage" type="button">Mariage</button>
+        <button data-tab="fiancailles" type="button">Fiançailles</button>
+        <button data-tab="evenement" type="button">Autre événement</button>
+        <button data-tab="seance" type="button">Séance photo</button>
+        <p class="group">Gestion</p>
+        <button data-tab="avis" type="button">Avis</button>
+        <button data-tab="publish" type="button">Publication</button>
+        <button data-tab="security" type="button">Sécurité</button>
+      </nav>
+
+      <main class="admin-main">
+
+        <!-- ===== Accueil : photo À propos ===== -->
+        <section class="admin-panel" data-panel="about">
+          <h2>Photo « À propos de nous »</h2>
+          <p class="lead">Cette photo s'affiche sur la page d'accueil, à côté de votre texte de présentation. Format conseillé : portrait (vertical).</p>
+          <div class="about-admin-preview">
+            <div class="about-photo" id="about-admin-photo"></div>
+            <div class="admin-toolbar">
+              <label class="btn btn--solid btn--sm file-btn">
+                Choisir une photo
+                <input type="file" id="input-about" accept="image/*">
+              </label>
+              <button class="btn btn--ghost btn--sm" id="btn-about-delete" type="button">Supprimer</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== Galeries ===== -->
+        <section class="admin-panel" data-panel="mariage" style="display:none">
+          <h2>Galerie — Mariage</h2>
+          <p class="lead">Ces photos alimentent la page Mariage et la première vitrine du défilement automatique de l'accueil. Utilisez ↑ et ↓ pour changer l'ordre d'affichage.</p>
+          <div class="admin-toolbar">
+            <label class="btn btn--solid btn--sm file-btn">
+              Ajouter des photos
+              <input type="file" id="input-mariage" accept="image/*" multiple>
+            </label>
+          </div>
+          <div class="admin-items"></div>
+        </section>
+
+        <section class="admin-panel" data-panel="fiancailles" style="display:none">
+          <h2>Galerie — Fiançailles</h2>
+          <p class="lead">Ces photos alimentent la page Fiançailles et la deuxième vitrine du défilement automatique de l'accueil.</p>
+          <div class="admin-toolbar">
+            <label class="btn btn--solid btn--sm file-btn">
+              Ajouter des photos
+              <input type="file" id="input-fiancailles" accept="image/*" multiple>
+            </label>
+          </div>
+          <div class="admin-items"></div>
+        </section>
+
+        <section class="admin-panel" data-panel="evenement" style="display:none">
+          <h2>Galerie — Autre événement</h2>
+          <p class="lead">Gender reveal, baptême, anniversaire... Ces photos alimentent la page Autre événement et la troisième vitrine de l'accueil.</p>
+          <div class="admin-toolbar">
+            <label class="btn btn--solid btn--sm file-btn">
+              Ajouter des photos
+              <input type="file" id="input-evenement" accept="image/*" multiple>
+            </label>
+          </div>
+          <div class="admin-items"></div>
+        </section>
+
+        <section class="admin-panel" data-panel="seance" style="display:none">
+          <h2>Galerie — Séance photo</h2>
+          <p class="lead">Portrait, couple, famille, lifestyle... Ces photos alimentent la page Séance photo et la quatrième vitrine de l'accueil.</p>
+          <div class="admin-toolbar">
+            <label class="btn btn--solid btn--sm file-btn">
+              Ajouter des photos
+              <input type="file" id="input-seance" accept="image/*" multiple>
+            </label>
+          </div>
+          <div class="admin-items"></div>
+        </section>
+
+        <!-- ===== Avis ===== -->
+        <section class="admin-panel" data-panel="avis" style="display:none">
+          <h2>Avis clients</h2>
+          <p class="lead">Les avis ci-dessous sont ceux visibles sur la page d'accueil. Vous pouvez supprimer un avis inapproprié.</p>
+          <div class="admin-items" id="admin-avis-list"></div>
+        </section>
+
+        <!-- ===== Publication ===== -->
+        <section class="admin-panel" data-panel="publish" style="display:none">
+          <h2>Publication &amp; sauvegarde</h2>
+          <p class="lead">Les photos ajoutées ici sont d'abord enregistrées dans <strong>ce navigateur</strong>. Pour qu'elles soient visibles par tous les visiteurs du site, publiez-les en 3 étapes :</p>
+          <p class="lead">1. Cliquez sur « Exporter » pour télécharger le fichier <strong>photos.json</strong>.<br>
+             2. Sur GitHub, ouvrez le dossier <strong>data</strong> de votre dépôt.<br>
+             3. Remplacez le fichier <strong>photos.json</strong> existant par celui téléchargé (Add file → Upload files).</p>
+          <div class="admin-toolbar">
+            <button class="btn btn--solid btn--sm" id="btn-export" type="button">Exporter (photos.json)</button>
+            <label class="btn btn--ghost btn--sm file-btn">
+              Importer une sauvegarde
+              <input type="file" id="input-import" accept="application/json,.json">
+            </label>
+          </div>
+          <div class="gauge">
+            <div class="gauge-bar"><div class="gauge-fill" id="gauge-fill"></div></div>
+            <p class="gauge-txt" id="gauge-txt"></p>
+          </div>
+          <div class="admin-note">
+            <strong>Bon à savoir :</strong> l'export sert aussi de sauvegarde. Conservez une copie du fichier photos.json — vous pourrez le réimporter ici depuis n'importe quel navigateur.
+          </div>
+        </section>
+
+        <!-- ===== Sécurité ===== -->
+        <section class="admin-panel" data-panel="security" style="display:none">
+          <h2>Sécurité</h2>
+          <p class="lead">Modifiez le mot de passe d'accès à cet espace admin.</p>
+          <form id="pass-form" style="max-width:380px">
+            <div class="field field--dark">
+              <label for="pass-current">Mot de passe actuel</label>
+              <input type="password" id="pass-current" required autocomplete="current-password">
+            </div>
+            <div class="field field--dark">
+              <label for="pass-new">Nouveau mot de passe</label>
+              <input type="password" id="pass-new" required minlength="6" autocomplete="new-password">
+            </div>
+            <div class="field field--dark">
+              <label for="pass-new2">Confirmer le nouveau mot de passe</label>
+              <input type="password" id="pass-new2" required minlength="6" autocomplete="new-password">
+            </div>
+            <button class="btn btn--solid btn--sm" type="submit">Modifier le mot de passe</button>
+            <p class="login-error" id="pass-error"></p>
+          </form>
+          <div class="admin-note">
+            <strong>Important :</strong> ce mot de passe est enregistré dans le navigateur utilisé. Sur un site statique (GitHub Pages), il s'agit d'une protection de confort : ne stockez jamais d'informations sensibles dans cet espace. Le mot de passe par défaut peut être changé durablement dans le fichier <strong>js/data.js</strong> (ligne DEFAULT_PASSWORD).
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
