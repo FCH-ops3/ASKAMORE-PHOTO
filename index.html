@@ -1,373 +1,291 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Askamore Photography — Photographe événementiel</title>
-  <meta name="description" content="Askamore Photography : photographie de mariage, fiançailles et événements. Séances photo sur-mesure. Un style moderne, élégant et professionnel.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Jost:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Askamore Photography — Photographe événementiel</title>
+<style>
+  :root{
+    --bg:#0f0e0c; --bg2:#171512; --ink:#f4efe6; --muted:#b8ad9c;
+    --gold:#c9a76a; --gold-2:#e4cf9f; --line:rgba(201,167,106,.25);
+    --card:#1c1a16; --serif:'Playfair Display',Georgia,serif;
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-weight:300;line-height:1.7;overflow-x:hidden}
+  h1,h2,h3,.serif{font-family:var(--serif)}
+  a{color:inherit;text-decoration:none}
+  img{display:block;max-width:100%}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 24px}
+  .eyebrow{letter-spacing:.35em;text-transform:uppercase;font-size:12px;color:var(--gold);font-weight:500}
+
+  /* NAV */
+  header.nav{position:fixed;top:0;left:0;right:0;z-index:100;transition:.4s;background:rgba(15,14,12,0);backdrop-filter:blur(0)}
+  header.nav.scrolled{background:rgba(15,14,12,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:76px}
+  .brand{font-family:var(--serif);font-size:24px;letter-spacing:.08em}
+  .brand span{color:var(--gold)}
+  .nav-links{display:flex;gap:30px;align-items:center}
+  .nav-links a{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);transition:.3s;position:relative}
+  .nav-links a:hover{color:var(--ink)}
+  .nav-links a.admin-link{border:1px solid var(--gold);padding:9px 16px;border-radius:2px;color:var(--gold)}
+  .nav-links a.admin-link:hover{background:var(--gold);color:#0f0e0c}
+  .burger{display:none;flex-direction:column;gap:5px;cursor:pointer}
+  .burger span{width:26px;height:2px;background:var(--ink)}
+
+  /* HERO */
+  .hero{height:100vh;min-height:640px;position:relative;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden}
+  .hero-bg{position:absolute;inset:0;background:linear-gradient(120deg,#1a1712,#0d0c0a 60%);z-index:0}
+  .hero-bg::after{content:"";position:absolute;inset:0;background:
+    radial-gradient(60% 60% at 30% 20%,rgba(201,167,106,.14),transparent 60%),
+    radial-gradient(50% 50% at 80% 80%,rgba(201,167,106,.08),transparent 60%)}
+  .hero-content{position:relative;z-index:2;padding:0 20px}
+  .hero h1{font-size:clamp(42px,7vw,86px);line-height:1.05;margin:18px 0 22px;font-weight:500}
+  .hero h1 em{color:var(--gold);font-style:italic}
+  .hero p{color:var(--muted);max-width:560px;margin:0 auto 34px;font-size:17px}
+  .btn{display:inline-block;padding:15px 34px;border:1px solid var(--gold);color:var(--gold);letter-spacing:.16em;text-transform:uppercase;font-size:12px;transition:.35s;border-radius:2px}
+  .btn:hover{background:var(--gold);color:#0f0e0c}
+  .btn.solid{background:var(--gold);color:#0f0e0c;margin-left:12px}
+  .btn.solid:hover{background:var(--gold-2)}
+  .scroll-cue{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);z-index:2;color:var(--muted);font-size:11px;letter-spacing:.3em;text-transform:uppercase}
+
+  section{padding:110px 0}
+  .section-head{text-align:center;margin-bottom:56px}
+  .section-head h2{font-size:clamp(30px,4.5vw,50px);margin:14px 0 12px;font-weight:500}
+  .section-head p{color:var(--muted);max-width:600px;margin:0 auto}
+
+  /* HOME AUTOSCROLL GALLERY */
+  .home-gallery{background:var(--bg2);position:relative}
+  .carousel{position:relative;overflow:hidden;margin:0 -24px}
+  .carousel-track{display:flex;gap:18px;width:max-content;animation:scroll 45s linear infinite;padding:0 24px}
+  .carousel:hover .carousel-track{animation-play-state:paused}
+  .slide{position:relative;flex:0 0 auto;width:440px;height:560px;border-radius:4px;overflow:hidden;background:#241f19}
+  .slide img{width:100%;height:100%;object-fit:cover;transition:.6s}
+  .slide:hover img{transform:scale(1.06)}
+  .slide-cap{position:absolute;left:0;right:0;bottom:0;padding:26px 24px 22px;background:linear-gradient(transparent,rgba(0,0,0,.82));z-index:2}
+  .slide-cap .k{color:var(--gold);letter-spacing:.25em;text-transform:uppercase;font-size:11px}
+  .slide-cap h3{font-size:24px;font-weight:500;margin-top:4px}
+  .slide a.full{position:absolute;inset:0;z-index:3}
+  @keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  .carousel::before,.carousel::after{content:"";position:absolute;top:0;bottom:0;width:120px;z-index:4;pointer-events:none}
+  .carousel::before{left:0;background:linear-gradient(90deg,var(--bg2),transparent)}
+  .carousel::after{right:0;background:linear-gradient(270deg,var(--bg2),transparent)}
+
+  /* SERVICES */
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:38px 30px;transition:.35s}
+  .card:hover{transform:translateY(-6px);border-color:var(--gold)}
+  .card .num{font-family:var(--serif);font-size:15px;color:var(--gold)}
+  .card h3{font-size:23px;margin:14px 0 10px;font-weight:500}
+  .card p{color:var(--muted);font-size:15px}
+
+  /* ABOUT */
+  .about{background:var(--bg2)}
+  .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+  .about-photo{border-radius:4px;overflow:hidden;aspect-ratio:4/5;background:#241f19;position:relative}
+  .about-photo img{width:100%;height:100%;object-fit:cover}
+  .about-photo .placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;letter-spacing:.2em;text-transform:uppercase;text-align:center;padding:20px}
+  .about-text h2{font-size:clamp(30px,4vw,46px);margin:14px 0 20px;font-weight:500}
+  .about-text p{color:var(--muted);margin-bottom:16px}
+  .stats{display:flex;gap:40px;margin-top:30px}
+  .stat .n{font-family:var(--serif);font-size:38px;color:var(--gold)}
+  .stat .l{font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
+
+  /* CONTACT */
+  .contact{text-align:center}
+  .contact .btn{margin-top:24px}
+
+  footer{background:#0b0a08;border-top:1px solid var(--line);padding:44px 0;text-align:center;color:var(--muted);font-size:13px}
+  footer .brand{font-size:20px;margin-bottom:10px}
+
+  /* ADMIN MODAL (login) */
+  .modal{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.75);backdrop-filter:blur(4px)}
+  .modal.open{display:flex}
+  .modal-box{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:40px;width:min(420px,90vw)}
+  .modal-box h3{font-size:26px;font-weight:500;margin-bottom:6px}
+  .modal-box p.sub{color:var(--muted);font-size:14px;margin-bottom:24px}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+  .field input{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--ink);padding:13px 14px;border-radius:3px;font-family:var(--sans);font-size:15px}
+  .field input:focus{outline:none;border-color:var(--gold)}
+  .modal .btn{width:100%;cursor:pointer;background:var(--gold);color:#0f0e0c;border:none;margin-top:6px}
+  .modal .close{position:absolute;top:20px;right:24px;color:var(--muted);font-size:26px;cursor:pointer}
+  .err{color:#e2807a;font-size:13px;margin-top:10px;min-height:18px}
+  .hint{color:var(--muted);font-size:12px;margin-top:14px;text-align:center}
+
+  @media(max-width:900px){
+    .about-grid{grid-template-columns:1fr;gap:36px}
+    .cards{grid-template-columns:1fr}
+    .nav-links{position:fixed;top:76px;left:0;right:0;background:rgba(15,14,12,.98);flex-direction:column;padding:24px;gap:20px;transform:translateY(-140%);transition:.4s;border-bottom:1px solid var(--line)}
+    .nav-links.show{transform:translateY(0)}
+    .burger{display:flex}
+    .slide{width:78vw;height:460px}
+  }
+</style>
 </head>
-<body data-page="home" id="top">
+<body>
 
-  <!-- ==================== Navigation ==================== -->
-  <header class="nav">
-    <div class="container nav-inner">
-      <a class="brand" href="#top">Askamore <em>Photography</em></a>
-      <nav aria-label="Navigation principale">
-        <ul class="nav-links">
-          <li><a href="#about">À propos</a></li>
-          <li><a href="#services">Prestations</a></li>
-          <li><a href="#gallery">Galerie</a></li>
-          <li><a href="#why">Pourquoi nous</a></li>
-          <li><a href="#avis">Avis</a></li>
-          <li><a href="#contact">Contact</a></li>
-          <li><a class="nav-admin" href="admin.html">Admin</a></li>
-        </ul>
-      </nav>
-      <button class="burger" aria-label="Ouvrir le menu" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
-  </header>
-  <div class="mobile-menu">
-    <a href="#about">À propos</a>
-    <a href="#services">Prestations</a>
-    <a href="#gallery">Galerie</a>
-    <a href="#why">Pourquoi nous</a>
-    <a href="#avis">Avis</a>
-    <a href="#contact">Contact</a>
-    <a href="admin.html">Espace admin</a>
+<header class="nav" id="nav">
+  <div class="wrap nav-inner">
+    <a href="#top" class="brand">ASKA<span>MORE</span></a>
+    <nav class="nav-links" id="navLinks">
+      <a href="#galerie">Galerie</a>
+      <a href="gallery.html?cat=mariage">Mariage</a>
+      <a href="gallery.html?cat=fiancailles">Fiançailles</a>
+      <a href="gallery.html?cat=evenement">Événement</a>
+      <a href="#apropos">À propos</a>
+      <a href="#contact">Contact</a>
+      <a href="admin.html" class="admin-link">Espace admin</a>
+    </nav>
+    <div class="burger" id="burger"><span></span><span></span><span></span></div>
   </div>
+</header>
 
-  <!-- ==================== Héros ==================== -->
-  <section class="hero">
-    <div class="container">
-      <div class="hero-inner">
-        <span class="eyebrow">Photographe événementiel</span>
-        <h1>L'art de transformer<br>vos moments précieux<br><em>en héritage visuel</em></h1>
-        <p class="hero-sub">Askamore Photography capture vos mariages, fiançailles et événements avec un regard moderne, sincère et élégant.</p>
-        <div class="hero-actions">
-          <a class="btn btn--solid" href="#contact">Réserver une séance</a>
-          <a class="btn btn--ghost" href="#gallery">Voir la galerie</a>
-        </div>
+<!-- HERO -->
+<div class="hero" id="top">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="eyebrow">Photographe événementiel</div>
+    <h1>Chaque instant<br>mérite d'être <em>éternel</em></h1>
+    <p>Askamore Photography capture l'émotion pure de vos mariages, fiançailles et grands événements avec un regard artistique et sincère.</p>
+    <a href="#galerie" class="btn">Voir la galerie</a>
+    <a href="#contact" class="btn solid">Réserver</a>
+  </div>
+  <div class="scroll-cue">Défiler</div>
+</div>
+
+<!-- HOME AUTOSCROLL GALLERY -->
+<section class="home-gallery" id="galerie">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Galerie</div>
+      <h2>Un aperçu de notre travail</h2>
+      <p>Un défilement de nos univers. Survolez pour mettre en pause, cliquez pour découvrir chaque galerie.</p>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="carousel">
+      <div class="carousel-track" id="carouselTrack"><!-- filled by JS --></div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Nos prestations</div>
+      <h2>Ce que nous immortalisons</h2>
+    </div>
+    <div class="cards">
+      <div class="card">
+        <div class="num">01</div><h3>Mariage</h3>
+        <p>De la préparation à la dernière danse, une couverture complète et élégante de votre plus beau jour.</p>
       </div>
-      <div class="hero-foot">
-        <span>Basé à Lyon — déplacement dans toute la France</span>
-        <a href="#about">Découvrir ↓</a>
+      <div class="card">
+        <div class="num">02</div><h3>Fiançailles</h3>
+        <p>Des séances intimes et naturelles pour célébrer le début de votre histoire à deux.</p>
+      </div>
+      <div class="card">
+        <div class="num">03</div><h3>Événement</h3>
+        <p>Anniversaires, baptêmes, soirées d'entreprise — chaque moment fort saisi avec justesse.</p>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ==================== À propos ==================== -->
-  <section class="section section--light" id="about">
-    <div class="container about-grid">
-      <div class="about-photo reveal" id="about-photo">
-        <div class="about-photo-empty">
-          <span class="mono">F · G</span>
-          <span>Portrait à venir</span>
-        </div>
+<!-- ABOUT -->
+<section class="about" id="apropos">
+  <div class="wrap">
+    <div class="about-grid">
+      <div class="about-photo" id="aboutPhoto">
+        <div class="placeholder">Photo « À propos »<br>modifiable depuis l'espace admin</div>
       </div>
-      <div class="reveal">
-        <span class="eyebrow">À propos de nous</span>
-        <p class="about-quote">« Nous ne nous contentons pas de prendre des photos, nous capturons ce que vous ressentez. »</p>
-        <p class="about-text">Nous sommes un couple de photographes, unis dans la vie comme dans notre vision artistique. Ensemble, nous immortalisons les instants les plus précieux avec une approche éditoriale, raffinée et profondément émotionnelle, afin de créer des souvenirs qui traversent le temps.</p>
-        <p class="about-sign">— Flavie &amp; Gökan</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ==================== Prestations ==================== -->
-  <section class="section" id="services">
-    <div class="container">
-      <div class="section-head reveal">
-        <span class="eyebrow">Prestations</span>
-        <h2 class="section-title">Des moments <em>à immortaliser</em></h2>
-      </div>
-      <div class="services-list reveal">
-        <div class="service-row">
-          <span class="service-num">01</span>
-          <h3>Mariage</h3>
-          <p>Préparatifs, cérémonie, réception : une couverture complète de votre journée, entre spontanéité et élégance.</p>
-        </div>
-        <div class="service-row">
-          <span class="service-num">02</span>
-          <h3>Fiançailles</h3>
-          <p>Une séance complice pour célébrer votre engagement, en extérieur ou dans un lieu qui vous ressemble.</p>
-        </div>
-        <div class="service-row">
-          <span class="service-num">03</span>
-          <h3>Autres événements</h3>
-          <p>Gender reveal, baptême, anniversaire... nous immortalisons la surprise et l'émotion de vos moments en famille.</p>
-        </div>
-        <div class="service-row">
-          <span class="service-num">04</span>
-          <h3>Séance photo</h3>
-          <p>Portrait, couple, famille ou lifestyle : une séance sur-mesure adaptée à votre univers.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ==================== Galerie vivante ==================== -->
-  <section class="section" id="gallery" style="padding-top:0">
-    <div class="container">
-      <div class="section-head reveal">
-        <span class="eyebrow">Galerie</span>
-        <h2 class="section-title">Un aperçu <em>de notre travail</em></h2>
-      </div>
-      <div class="live-grid reveal">
-        <a class="live-panel" href="mariage.html" data-cat="mariage" aria-label="Voir la galerie Mariage">
-          <div class="live-shade"></div>
-          <span class="live-counter"></span>
-          <div class="live-label">
-            <div><span class="num">I</span><h3>Mariage</h3></div>
-            <span class="live-cta">Voir la galerie →</span>
-          </div>
-        </a>
-        <a class="live-panel" href="fiancailles.html" data-cat="fiancailles" aria-label="Voir la galerie Fiançailles">
-          <div class="live-shade"></div>
-          <span class="live-counter"></span>
-          <div class="live-label">
-            <div><span class="num">II</span><h3>Fiançailles</h3></div>
-            <span class="live-cta">Voir la galerie →</span>
-          </div>
-        </a>
-        <a class="live-panel" href="gender-reveal.html" data-cat="evenement" aria-label="Voir la galerie Autre événement">
-          <div class="live-shade"></div>
-          <span class="live-counter"></span>
-          <div class="live-label">
-            <div><span class="num">III</span><h3>Autre événement</h3></div>
-            <span class="live-cta">Voir la galerie →</span>
-          </div>
-        </a>
-        <a class="live-panel" href="seance-photo.html" data-cat="seance" aria-label="Voir la galerie Séance photo">
-          <div class="live-shade"></div>
-          <span class="live-counter"></span>
-          <div class="live-label">
-            <div><span class="num">IV</span><h3>Séance photo</h3></div>
-            <span class="live-cta">Voir la galerie →</span>
-          </div>
-        </a>
-      </div>
-      <p class="section-note reveal">Chaque vitrine défile automatiquement parmi les photos de sa galerie — cliquez sur une catégorie pour la découvrir en entier.</p>
-    </div>
-  </section>
-
-  <!-- ==================== Pourquoi nous ==================== -->
-  <section class="section section--light" id="why">
-    <div class="container">
-      <div class="section-head reveal">
-        <span class="eyebrow">Pourquoi nous choisir ?</span>
-        <h2 class="section-title">Une expérience <em>pensée pour vous</em></h2>
-      </div>
-      <div class="why-grid reveal">
-        <div class="why-card">
-          <span class="tag">01 — Style</span>
-          <h3>Moderne &amp; intemporel</h3>
-          <p>Un rendu épuré et élégant, entre lumière naturelle et retouches soignées, pour des photos qui traversent le temps.</p>
-        </div>
-        <div class="why-card">
-          <span class="tag">02 — Proximité</span>
-          <h3>Un accompagnement humain</h3>
-          <p>De la prise de contact à la remise des photos, nous restons disponibles et à l'écoute pour que vous vous sentiez à l'aise.</p>
-        </div>
-        <div class="why-card">
-          <span class="tag">03 — Engagement</span>
-          <h3>Un rendu professionnel</h3>
-          <p>Matériel adapté, livraison soignée et délais respectés : nous traitons chaque projet avec la même exigence.</p>
-        </div>
-        <div class="why-card">
-          <span class="tag">04 — Sur-mesure</span>
-          <h3>Un devis adapté à vous</h3>
-          <p>Chaque devis est fait sur-mesure, selon votre événement, vos envies et votre budget.</p>
+      <div class="about-text">
+        <div class="eyebrow">À propos de nous</div>
+        <h2>L'émotion au cœur de chaque image</h2>
+        <p id="aboutText">Askamore Photography est né d'une passion : celle de raconter des histoires vraies. Nous croyons qu'une belle photographie ne se pose pas, elle se ressent. Notre approche allie discrétion, sens du détail et une lumière travaillée pour révéler l'authenticité de chaque instant.</p>
+        <p>Basés à Lyon, nous nous déplaçons partout où vos souvenirs nous attendent.</p>
+        <div class="stats">
+          <div class="stat"><div class="n">200+</div><div class="l">Événements</div></div>
+          <div class="stat"><div class="n">8</div><div class="l">Ans d'expérience</div></div>
+          <div class="stat"><div class="n">100%</div><div class="l">Sur-mesure</div></div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ==================== Instagram ==================== -->
-  <section class="section insta">
-    <div class="container reveal">
-      <span class="eyebrow" style="justify-content:center">Instagram</span>
-      <div><a class="handle" href="https://www.instagram.com/Askamore_photography" target="_blank" rel="noopener">@Askamore_photography</a></div>
-      <a class="btn btn--ghost" href="https://www.instagram.com/Askamore_photography" target="_blank" rel="noopener">Suivre le compte</a>
-    </div>
-  </section>
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="wrap">
+    <div class="eyebrow">Contact</div>
+    <h2 style="font-size:clamp(30px,4.5vw,50px);margin:14px 0 14px;font-weight:500">Parlons de votre projet</h2>
+    <p style="color:var(--muted);max-width:520px;margin:0 auto">Envie de capturer un moment unique ? Écrivez-nous, nous vous répondrons sous 48h.</p>
+    <a href="mailto:contact@askamore.fr" class="btn">contact@askamore.fr</a>
+  </div>
+</section>
 
-  <!-- ==================== Contact ==================== -->
-  <section class="section section--light" id="contact">
-    <div class="container">
-      <div class="section-head reveal">
-        <span class="eyebrow">Contact</span>
-        <h2 class="section-title">Parlons de <em>votre projet</em></h2>
-      </div>
-      <div class="contact-grid">
-        <div class="reveal">
-          <div class="channel">
-            <span class="badge">T</span>
-            <div>
-              <span class="lbl">Téléphone / WhatsApp</span>
-              <a href="tel:0781703726">07 81 70 37 26</a>
-            </div>
-          </div>
-          <div class="channel">
-            <span class="badge">@</span>
-            <div>
-              <span class="lbl">E-mail</span>
-              <a href="mailto:askamorephotography@outlook.fr">askamorephotography@outlook.fr</a>
-            </div>
-          </div>
-          <div class="channel">
-            <span class="badge">IG</span>
-            <div>
-              <span class="lbl">Instagram</span>
-              <a href="https://www.instagram.com/Askamore_photography" target="_blank" rel="noopener">@Askamore_photography</a>
-            </div>
-          </div>
-          <div class="channel">
-            <span class="badge">TT</span>
-            <div>
-              <span class="lbl">TikTok</span>
-              <a href="https://www.tiktok.com/@Askamore_photography" target="_blank" rel="noopener">@Askamore_photography</a>
-            </div>
-          </div>
-        </div>
-        <form class="reveal" id="contact-form">
-          <div class="field-duo">
-            <div class="field">
-              <label for="c-name">Nom</label>
-              <input type="text" id="c-name" required autocomplete="name">
-            </div>
-            <div class="field">
-              <label for="c-email">E-mail</label>
-              <input type="email" id="c-email" required autocomplete="email">
-            </div>
-          </div>
-          <div class="field">
-            <label for="c-type">Type de prestation</label>
-            <select id="c-type">
-              <option>Mariage</option>
-              <option>Fiançailles</option>
-              <option>Autre événement (gender reveal, baptême, anniversaire...)</option>
-              <option>Séance photo</option>
-              <option>Autre</option>
-            </select>
-          </div>
-          <div class="field-duo">
-            <div class="field">
-              <label for="c-date">Date de l'événement</label>
-              <input type="date" id="c-date">
-            </div>
-            <div class="field">
-              <label for="c-lieu">Localisation</label>
-              <input type="text" id="c-lieu" placeholder="Ville, lieu de réception...">
-            </div>
-          </div>
-          <div class="field">
-            <label for="c-msg">Votre message</label>
-            <textarea id="c-msg" required placeholder="Parlez-nous de votre projet..."></textarea>
-          </div>
-          <button class="btn btn--ink" type="submit">Envoyer la demande</button>
-          <p class="form-hint">L'envoi ouvre votre application e-mail avec votre demande pré-remplie.</p>
-        </form>
-      </div>
-    </div>
-  </section>
+<footer>
+  <div class="brand" style="font-family:var(--serif)">ASKA<span style="color:var(--gold)">MORE</span></div>
+  <div>© 2026 Askamore Photography — Tous droits réservés</div>
+</footer>
 
-  <!-- ==================== Avis ==================== -->
-  <section class="section" id="avis">
-    <div class="container">
-      <div class="avis-head reveal">
-        <div class="section-head" style="margin-bottom:0">
-          <span class="eyebrow">Avis clients</span>
-          <h2 class="section-title">Ce qu'ils en <em>pensent</em></h2>
-        </div>
-        <div class="avis-score">
-          <span class="num" id="avis-score">5.0</span>
-          <div>
-            <div class="avis-stars" id="avis-stars">★★★★★</div>
-            <div class="avis-count" id="avis-count">0 avis</div>
-          </div>
-        </div>
-      </div>
+<!-- ADMIN LOGIN MODAL (accessible aussi via lien direct) -->
+<div class="modal" id="loginModal">
+  <div class="modal-box" style="position:relative">
+    <span class="close" id="closeLogin">&times;</span>
+    <h3>Espace admin</h3>
+    <p class="sub">Connectez-vous pour gérer vos galeries et contenus.</p>
+    <div class="field"><label>Identifiant</label><input type="text" id="loginUser" autocomplete="username"></div>
+    <div class="field"><label>Mot de passe</label><input type="password" id="loginPass" autocomplete="current-password"></div>
+    <button class="btn" id="loginBtn">Se connecter</button>
+    <div class="err" id="loginErr"></div>
+    <div class="hint">Par défaut : <b>admin</b> / <b>admin</b></div>
+  </div>
+</div>
 
-      <p class="avis-empty" id="avis-empty">Aucun avis pour le moment — soyez le premier à partager votre expérience.</p>
-      <div class="avis-list" id="avis-list"></div>
+<script src="data.js"></script>
+<script>
+  // NAV scroll state
+  const nav=document.getElementById('nav');
+  addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>40));
+  // Burger
+  document.getElementById('burger').onclick=()=>document.getElementById('navLinks').classList.toggle('show');
 
-      <div class="avis-form-wrap reveal">
-        <h3>Laisser un avis</h3>
-        <p>Votre avis nous aide à faire connaître notre travail.</p>
-        <form id="avis-form">
-          <div class="stars-input" role="group" aria-label="Votre note sur 5">
-            <button type="button" aria-label="1 étoile">★</button>
-            <button type="button" aria-label="2 étoiles">★</button>
-            <button type="button" aria-label="3 étoiles">★</button>
-            <button type="button" aria-label="4 étoiles">★</button>
-            <button type="button" aria-label="5 étoiles">★</button>
-          </div>
-          <div class="field-duo">
-            <div class="field field--dark">
-              <label for="avis-name">Votre nom</label>
-              <input type="text" id="avis-name" required>
-            </div>
-            <div class="field field--dark">
-              <label for="avis-service">Prestation concernée</label>
-              <select id="avis-service">
-                <option value="mariage">Mariage</option>
-                <option value="fiancailles">Fiançailles</option>
-                <option value="evenement">Autre événement</option>
-                <option value="seance">Séance photo</option>
-              </select>
-            </div>
-          </div>
-          <div class="field field--dark">
-            <label for="avis-text">Votre commentaire</label>
-            <textarea id="avis-text" required></textarea>
-          </div>
-          <button class="btn btn--solid" type="submit">Publier mon avis</button>
-          <p class="form-hint" id="avis-merci" style="display:none;color:var(--champagne)">Merci pour votre avis !</p>
-        </form>
-      </div>
-    </div>
-  </section>
+  // Build autoscroll carousel from stored galleries (duplicated for seamless loop)
+  const cats=Askamore.getCategories();
+  const track=document.getElementById('carouselTrack');
+  function slideHTML(c){
+    const cover=(Askamore.getPhotos(c.id)[0])||c.cover;
+    const img=cover?`<img src="${cover}" alt="${c.name}">`:`<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px;letter-spacing:.2em;text-transform:uppercase">${c.name}</div>`;
+    return `<div class="slide">${img}
+      <div class="slide-cap"><div class="k">Galerie</div><h3>${c.name}</h3></div>
+      <a class="full" href="gallery.html?cat=${c.id}"></a></div>`;
+  }
+  const html=cats.map(slideHTML).join('');
+  track.innerHTML=html+html; // duplicate => seamless infinite scroll
 
-  <!-- ==================== Pied de page ==================== -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-grid">
-        <div>
-          <a class="brand" href="#top">Askamore <em>Photography</em></a>
-          <p class="desc">Photographes événementiels basés à Lyon, déplacement dans toute la France.</p>
-        </div>
-        <div class="footer-col">
-          <h4>Navigation</h4>
-          <a href="#about">À propos</a>
-          <a href="#services">Prestations</a>
-          <a href="#gallery">Galerie</a>
-          <a href="#contact">Contact</a>
-          <a href="admin.html">Espace admin</a>
-        </div>
-        <div class="footer-col">
-          <h4>Suivez-nous</h4>
-          <a href="https://www.instagram.com/Askamore_photography" target="_blank" rel="noopener">Instagram</a>
-          <a href="https://www.tiktok.com/@Askamore_photography" target="_blank" rel="noopener">TikTok</a>
-          <a href="tel:0781703726">Téléphone</a>
-          <a href="mailto:askamorephotography@outlook.fr">E-mail</a>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <span>© 2026 Askamore Photography. Tous droits réservés.</span>
-        <span>Mariage · Fiançailles · Autre événement · Séance photo</span>
-      </div>
-    </div>
-  </footer>
+  // About section content from storage
+  const about=Askamore.getAbout();
+  if(about.text) document.getElementById('aboutText').textContent=about.text;
+  if(about.photo){
+    const box=document.getElementById('aboutPhoto');
+    box.innerHTML=`<img src="${about.photo}" alt="À propos de nous">`;
+  }
 
-  <a class="to-top" href="#top" aria-label="Retour en haut">↑</a>
-
-  <script src="js/data.js"></script>
-  <script src="js/main.js"></script>
+  // Login modal (still available on home; admin-link goes to admin.html which redirects here if not logged)
+  const modal=document.getElementById('loginModal');
+  document.getElementById('closeLogin').onclick=()=>modal.classList.remove('open');
+  if(location.hash==='#login'){modal.classList.add('open');}
+  document.getElementById('loginBtn').onclick=()=>{
+    const u=document.getElementById('loginUser').value.trim();
+    const p=document.getElementById('loginPass').value;
+    if(Askamore.login(u,p)){location.href='admin.html';}
+    else document.getElementById('loginErr').textContent='Identifiant ou mot de passe incorrect.';
+  };
+</script>
 </body>
 </html>

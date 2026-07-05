@@ -1,188 +1,253 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Espace admin — Askamore Photography</title>
-  <meta name="robots" content="noindex, nofollow">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Jost:ital,wght@0,300;0,400;0,500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Espace admin — Askamore</title>
+<style>
+  :root{--bg:#0f0e0c;--bg2:#171512;--ink:#f4efe6;--muted:#b8ad9c;--gold:#c9a76a;--line:rgba(201,167,106,.25);--card:#1c1a16;--serif:'Playfair Display',Georgia,serif;--sans:'Inter',sans-serif}
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;500&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-weight:300}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+  header{border-bottom:1px solid var(--line);background:var(--bg2)}
+  .top{display:flex;align-items:center;justify-content:space-between;height:72px}
+  .brand{font-family:var(--serif);font-size:22px}.brand span{color:var(--gold)}
+  .top .right{display:flex;gap:16px;align-items:center;font-size:13px}
+  .top a,.top button{color:var(--muted);background:none;border:none;cursor:pointer;font-size:13px;letter-spacing:.1em;text-transform:uppercase}
+  .top a:hover,.top button:hover{color:var(--gold)}
+  .tabs{display:flex;gap:8px;margin:40px 0 30px;flex-wrap:wrap}
+  .tab{padding:11px 20px;border:1px solid var(--line);border-radius:3px;cursor:pointer;color:var(--muted);font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+  .tab.active{background:var(--gold);color:#0f0e0c;border-color:var(--gold)}
+  .panel{display:none}.panel.active{display:block;padding-bottom:100px}
+  h2{font-family:var(--serif);font-weight:500;font-size:30px;margin-bottom:6px}
+  .muted{color:var(--muted);font-size:14px;margin-bottom:26px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:26px;margin-bottom:22px}
+  label{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  input[type=text],textarea,select{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--ink);padding:12px 14px;border-radius:3px;font-family:var(--sans);font-size:15px}
+  textarea{min-height:120px;resize:vertical}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold)}
+  .btn{display:inline-block;padding:12px 26px;background:var(--gold);color:#0f0e0c;border:none;border-radius:3px;cursor:pointer;letter-spacing:.1em;text-transform:uppercase;font-size:12px;font-weight:600;margin-top:14px}
+  .btn.ghost{background:none;border:1px solid var(--line);color:var(--muted)}
+  .btn.ghost:hover{border-color:var(--gold);color:var(--gold)}
+  .btn.danger{background:none;border:1px solid #7a3b38;color:#e2807a;padding:8px 14px;font-size:11px;margin:0}
+  .row{display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap}
+  .row>div{flex:1;min-width:200px}
+  .thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-top:18px}
+  .thumb{position:relative;border-radius:4px;overflow:hidden;aspect-ratio:1;background:#241f19}
+  .thumb img{width:100%;height:100%;object-fit:cover}
+  .thumb button{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.7);color:#fff;border:none;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:15px}
+  .catbar{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
+  .catbar:last-child{border-bottom:none}
+  .about-photo{width:220px;aspect-ratio:4/5;border-radius:4px;overflow:hidden;background:#241f19;margin-top:14px}
+  .about-photo img{width:100%;height:100%;object-fit:cover}
+  .file{display:inline-block;padding:12px 22px;border:1px dashed var(--gold);color:var(--gold);border-radius:3px;cursor:pointer;font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin-top:6px}
+  .file input{display:none}
+  .ok{color:var(--gold);font-size:13px;margin-left:12px}
+  /* Login gate */
+  .gate{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg);z-index:50}
+  .gate .box{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:40px;width:min(400px,90vw)}
+  .gate h3{font-family:var(--serif);font-size:26px;font-weight:500;margin-bottom:4px}
+  .gate p{color:var(--muted);font-size:14px;margin-bottom:22px}
+  .gate .field{margin-bottom:14px}
+  .err{color:#e2807a;font-size:13px;min-height:18px}
+  .hint{color:var(--muted);font-size:12px;text-align:center;margin-top:14px}
+</style>
 </head>
-<body class="admin-body" data-page="admin">
+<body>
 
-  <!-- ==================== Connexion ==================== -->
-  <div class="admin-login" id="admin-login">
-    <div class="login-card">
-      <span class="brand">Askamore <em>Photography</em></span>
-      <p class="sub">Espace admin</p>
-      <form id="login-form">
-        <div class="field field--dark">
-          <label for="login-pass">Mot de passe</label>
-          <input type="password" id="login-pass" required autocomplete="current-password">
+<!-- LOGIN GATE -->
+<div class="gate" id="gate">
+  <div class="box">
+    <h3>Espace admin</h3>
+    <p>Connexion requise.</p>
+    <div class="field"><label>Identifiant</label><input type="text" id="u"></div>
+    <div class="field"><label>Mot de passe</label><input type="password" id="p"></div>
+    <button class="btn" id="loginBtn" style="width:100%">Se connecter</button>
+    <div class="err" id="err"></div>
+    <div class="hint">Par défaut : <b>admin</b> / <b>admin</b></div>
+  </div>
+</div>
+
+<div id="app" style="display:none">
+<header><div class="wrap top">
+  <div class="brand">ASKA<span>MORE</span> · Admin</div>
+  <div class="right">
+    <a href="index.html#top" target="_blank">Voir le site ↗</a>
+    <button id="logout">Déconnexion</button>
+  </div>
+</div></header>
+
+<div class="wrap">
+  <div class="tabs">
+    <div class="tab active" data-p="galeries">Galeries</div>
+    <div class="tab" data-p="apropos">À propos de nous</div>
+    <div class="tab" data-p="reglages">Réglages</div>
+  </div>
+
+  <!-- GALERIES -->
+  <div class="panel active" id="p-galeries">
+    <h2>Galeries</h2>
+    <p class="muted">Ajoutez des catégories et téléversez vos photos. Elles apparaissent sur la page d'accueil (défilement) et dans chaque galerie.</p>
+
+    <div class="card">
+      <div class="row">
+        <div>
+          <label>Choisir une galerie à gérer</label>
+          <select id="catSelect"></select>
         </div>
-        <button class="btn btn--solid" type="submit" style="width:100%">Se connecter</button>
-        <p class="login-error" id="login-error"></p>
-      </form>
-      <a class="login-back" href="index.html">← Retour au site</a>
-    </div>
-  </div>
-
-  <!-- ==================== Tableau de bord ==================== -->
-  <div class="admin-shell" id="admin-shell">
-    <header class="admin-header">
-      <span class="brand">Askamore <em>Admin</em></span>
-      <div class="actions">
-        <a class="btn btn--ghost btn--sm" href="index.html">Voir le site</a>
-        <button class="btn btn--ghost btn--sm" id="btn-logout" type="button">Se déconnecter</button>
+        <div style="flex:0">
+          <label style="visibility:hidden">.</label>
+          <label class="file" style="margin:0">Téléverser des photos
+            <input type="file" id="photoInput" accept="image/*" multiple>
+          </label>
+        </div>
       </div>
-    </header>
+      <div class="thumbs" id="thumbs"></div>
+    </div>
 
-    <div class="admin-layout">
-      <nav class="admin-nav" aria-label="Sections de l'administration">
-        <p class="group">Page d'accueil</p>
-        <button data-tab="about" class="active" type="button">À propos — photo</button>
-        <p class="group">Galeries</p>
-        <button data-tab="mariage" type="button">Mariage</button>
-        <button data-tab="fiancailles" type="button">Fiançailles</button>
-        <button data-tab="evenement" type="button">Autre événement</button>
-        <button data-tab="seance" type="button">Séance photo</button>
-        <p class="group">Gestion</p>
-        <button data-tab="avis" type="button">Avis</button>
-        <button data-tab="publish" type="button">Publication</button>
-        <button data-tab="security" type="button">Sécurité</button>
-      </nav>
+    <div class="card">
+      <label>Nouvelle catégorie</label>
+      <div class="row">
+        <div><input type="text" id="newCat" placeholder="Ex : Baptême, Portrait..."></div>
+        <div style="flex:0"><button class="btn" id="addCat" style="margin:0">Ajouter</button></div>
+      </div>
+    </div>
 
-      <main class="admin-main">
-
-        <!-- ===== Accueil : photo À propos ===== -->
-        <section class="admin-panel" data-panel="about">
-          <h2>Photo « À propos de nous »</h2>
-          <p class="lead">Cette photo s'affiche sur la page d'accueil, à côté de votre texte de présentation. Format conseillé : portrait (vertical).</p>
-          <div class="about-admin-preview">
-            <div class="about-photo" id="about-admin-photo"></div>
-            <div class="admin-toolbar">
-              <label class="btn btn--solid btn--sm file-btn">
-                Choisir une photo
-                <input type="file" id="input-about" accept="image/*">
-              </label>
-              <button class="btn btn--ghost btn--sm" id="btn-about-delete" type="button">Supprimer</button>
-            </div>
-          </div>
-        </section>
-
-        <!-- ===== Galeries ===== -->
-        <section class="admin-panel" data-panel="mariage" style="display:none">
-          <h2>Galerie — Mariage</h2>
-          <p class="lead">Ces photos alimentent la page Mariage et la première vitrine du défilement automatique de l'accueil. Utilisez ↑ et ↓ pour changer l'ordre d'affichage.</p>
-          <div class="admin-toolbar">
-            <label class="btn btn--solid btn--sm file-btn">
-              Ajouter des photos
-              <input type="file" id="input-mariage" accept="image/*" multiple>
-            </label>
-          </div>
-          <div class="admin-items"></div>
-        </section>
-
-        <section class="admin-panel" data-panel="fiancailles" style="display:none">
-          <h2>Galerie — Fiançailles</h2>
-          <p class="lead">Ces photos alimentent la page Fiançailles et la deuxième vitrine du défilement automatique de l'accueil.</p>
-          <div class="admin-toolbar">
-            <label class="btn btn--solid btn--sm file-btn">
-              Ajouter des photos
-              <input type="file" id="input-fiancailles" accept="image/*" multiple>
-            </label>
-          </div>
-          <div class="admin-items"></div>
-        </section>
-
-        <section class="admin-panel" data-panel="evenement" style="display:none">
-          <h2>Galerie — Autre événement</h2>
-          <p class="lead">Gender reveal, baptême, anniversaire... Ces photos alimentent la page Autre événement et la troisième vitrine de l'accueil.</p>
-          <div class="admin-toolbar">
-            <label class="btn btn--solid btn--sm file-btn">
-              Ajouter des photos
-              <input type="file" id="input-evenement" accept="image/*" multiple>
-            </label>
-          </div>
-          <div class="admin-items"></div>
-        </section>
-
-        <section class="admin-panel" data-panel="seance" style="display:none">
-          <h2>Galerie — Séance photo</h2>
-          <p class="lead">Portrait, couple, famille, lifestyle... Ces photos alimentent la page Séance photo et la quatrième vitrine de l'accueil.</p>
-          <div class="admin-toolbar">
-            <label class="btn btn--solid btn--sm file-btn">
-              Ajouter des photos
-              <input type="file" id="input-seance" accept="image/*" multiple>
-            </label>
-          </div>
-          <div class="admin-items"></div>
-        </section>
-
-        <!-- ===== Avis ===== -->
-        <section class="admin-panel" data-panel="avis" style="display:none">
-          <h2>Avis clients</h2>
-          <p class="lead">Les avis ci-dessous sont ceux visibles sur la page d'accueil. Vous pouvez supprimer un avis inapproprié.</p>
-          <div class="admin-items" id="admin-avis-list"></div>
-        </section>
-
-        <!-- ===== Publication ===== -->
-        <section class="admin-panel" data-panel="publish" style="display:none">
-          <h2>Publication &amp; sauvegarde</h2>
-          <p class="lead">Les photos ajoutées ici sont d'abord enregistrées dans <strong>ce navigateur</strong>. Pour qu'elles soient visibles par tous les visiteurs du site, publiez-les en 3 étapes :</p>
-          <p class="lead">1. Cliquez sur « Exporter » pour télécharger le fichier <strong>photos.json</strong>.<br>
-             2. Sur GitHub, ouvrez le dossier <strong>data</strong> de votre dépôt.<br>
-             3. Remplacez le fichier <strong>photos.json</strong> existant par celui téléchargé (Add file → Upload files).</p>
-          <div class="admin-toolbar">
-            <button class="btn btn--solid btn--sm" id="btn-export" type="button">Exporter (photos.json)</button>
-            <label class="btn btn--ghost btn--sm file-btn">
-              Importer une sauvegarde
-              <input type="file" id="input-import" accept="application/json,.json">
-            </label>
-          </div>
-          <div class="gauge">
-            <div class="gauge-bar"><div class="gauge-fill" id="gauge-fill"></div></div>
-            <p class="gauge-txt" id="gauge-txt"></p>
-          </div>
-          <div class="admin-note">
-            <strong>Bon à savoir :</strong> l'export sert aussi de sauvegarde. Conservez une copie du fichier photos.json — vous pourrez le réimporter ici depuis n'importe quel navigateur.
-          </div>
-        </section>
-
-        <!-- ===== Sécurité ===== -->
-        <section class="admin-panel" data-panel="security" style="display:none">
-          <h2>Sécurité</h2>
-          <p class="lead">Modifiez le mot de passe d'accès à cet espace admin.</p>
-          <form id="pass-form" style="max-width:380px">
-            <div class="field field--dark">
-              <label for="pass-current">Mot de passe actuel</label>
-              <input type="password" id="pass-current" required autocomplete="current-password">
-            </div>
-            <div class="field field--dark">
-              <label for="pass-new">Nouveau mot de passe</label>
-              <input type="password" id="pass-new" required minlength="6" autocomplete="new-password">
-            </div>
-            <div class="field field--dark">
-              <label for="pass-new2">Confirmer le nouveau mot de passe</label>
-              <input type="password" id="pass-new2" required minlength="6" autocomplete="new-password">
-            </div>
-            <button class="btn btn--solid btn--sm" type="submit">Modifier le mot de passe</button>
-            <p class="login-error" id="pass-error"></p>
-          </form>
-          <div class="admin-note">
-            <strong>Important :</strong> ce mot de passe est enregistré dans le navigateur utilisé. Sur un site statique (GitHub Pages), il s'agit d'une protection de confort : ne stockez jamais d'informations sensibles dans cet espace. Le mot de passe par défaut peut être changé durablement dans le fichier <strong>js/data.js</strong> (ligne DEFAULT_PASSWORD).
-          </div>
-        </section>
-
-      </main>
+    <div class="card">
+      <label>Catégories existantes</label>
+      <div id="catList"></div>
     </div>
   </div>
 
-  <div class="toast" id="toast" role="status"></div>
+  <!-- A PROPOS -->
+  <div class="panel" id="p-apropos">
+    <h2>À propos de nous</h2>
+    <p class="muted">Modifiez le texte et la photo affichés dans la section « À propos » de la page d'accueil.</p>
+    <div class="card">
+      <label>Texte de présentation</label>
+      <textarea id="aboutText" placeholder="Votre texte..."></textarea>
 
-  <script src="js/data.js"></script>
-  <script src="js/admin.js"></script>
+      <label style="margin-top:22px">Photo « À propos »</label>
+      <label class="file">Téléverser une photo
+        <input type="file" id="aboutFile" accept="image/*">
+      </label>
+      <div class="about-photo" id="aboutPreview" style="display:none"><img id="aboutImg"></div>
+
+      <div>
+        <button class="btn" id="saveAbout">Enregistrer</button>
+        <span class="ok" id="aboutOk" style="display:none">Enregistré ✓</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- REGLAGES -->
+  <div class="panel" id="p-reglages">
+    <h2>Réglages</h2>
+    <p class="muted">Modifier le mot de passe de l'espace admin.</p>
+    <div class="card">
+      <label>Nouveau mot de passe</label>
+      <input type="text" id="newPass" placeholder="Nouveau mot de passe">
+      <div><button class="btn" id="savePass">Mettre à jour</button>
+      <span class="ok" id="passOk" style="display:none">Mis à jour ✓</span></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script src="data.js"></script>
+<script>
+  // ---- Gate ----
+  const gate=document.getElementById('gate'), app=document.getElementById('app');
+  function showApp(){gate.style.display='none';app.style.display='block';init();}
+  if(Askamore.isLogged()) showApp();
+  document.getElementById('loginBtn').onclick=()=>{
+    if(Askamore.login(document.getElementById('u').value.trim(),document.getElementById('p').value)) showApp();
+    else document.getElementById('err').textContent='Identifiant ou mot de passe incorrect.';
+  };
+  document.getElementById('p').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('loginBtn').click();});
+  document.getElementById('logout').onclick=()=>{Askamore.logout();location.reload();};
+
+  // ---- Tabs ----
+  document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('p-'+t.dataset.p).classList.add('active');
+  });
+
+  const fileToDataUrl=f=>new Promise(res=>{const r=new FileReader();r.onload=()=>res(r.result);r.readAsDataURL(f);});
+
+  function init(){
+    refreshCats();
+    // About
+    const ab=Askamore.getAbout();
+    document.getElementById('aboutText').value=ab.text||'';
+    if(ab.photo){document.getElementById('aboutImg').src=ab.photo;document.getElementById('aboutPreview').style.display='block';}
+  }
+
+  // ---- Galeries ----
+  function refreshCats(){
+    const cats=Askamore.getCategories();
+    const sel=document.getElementById('catSelect');
+    const cur=sel.value;
+    sel.innerHTML=cats.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+    if(cats.some(c=>c.id===cur)) sel.value=cur;
+    renderThumbs();
+    // list with delete
+    document.getElementById('catList').innerHTML=cats.map(c=>
+      `<div class="catbar"><span>${c.name} <span style="color:var(--muted)">(${Askamore.getPhotos(c.id).length} photo·s)</span></span>
+       <button class="btn danger" data-del="${c.id}">Supprimer</button></div>`).join('');
+    document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{
+      if(confirm('Supprimer cette catégorie et ses photos ?')){Askamore.removeCategory(b.dataset.del);refreshCats();}
+    });
+  }
+  document.getElementById('catSelect').onchange=renderThumbs;
+  function renderThumbs(){
+    const id=document.getElementById('catSelect').value;
+    const photos=Askamore.getPhotos(id);
+    document.getElementById('thumbs').innerHTML=photos.map((p,i)=>
+      `<div class="thumb"><img src="${p}"><button data-i="${i}">×</button></div>`).join('')
+      || '<p style="color:var(--muted);font-size:14px;margin-top:14px">Aucune photo. Téléversez-en ci-dessus.</p>';
+    document.querySelectorAll('#thumbs [data-i]').forEach(b=>b.onclick=()=>{
+      Askamore.removePhoto(id,+b.dataset.i);renderThumbs();refreshCats();
+    });
+  }
+  document.getElementById('photoInput').onchange=async e=>{
+    const id=document.getElementById('catSelect').value;
+    const urls=[];for(const f of e.target.files) urls.push(await fileToDataUrl(f));
+    Askamore.addPhotos(id,urls);e.target.value='';renderThumbs();refreshCats();
+  };
+  document.getElementById('addCat').onclick=()=>{
+    const name=document.getElementById('newCat').value.trim();
+    if(!name) return;
+    if(Askamore.addCategory(name)===null){alert('Cette catégorie existe déjà.');return;}
+    document.getElementById('newCat').value='';refreshCats();
+  };
+
+  // ---- About ----
+  let aboutPhotoData=null;
+  document.getElementById('aboutFile').onchange=async e=>{
+    if(!e.target.files[0])return;
+    aboutPhotoData=await fileToDataUrl(e.target.files[0]);
+    document.getElementById('aboutImg').src=aboutPhotoData;
+    document.getElementById('aboutPreview').style.display='block';
+  };
+  document.getElementById('saveAbout').onclick=()=>{
+    const patch={text:document.getElementById('aboutText').value};
+    if(aboutPhotoData) patch.photo=aboutPhotoData;
+    Askamore.setAbout(patch);
+    const ok=document.getElementById('aboutOk');ok.style.display='inline';setTimeout(()=>ok.style.display='none',2000);
+  };
+
+  // ---- Password ----
+  document.getElementById('savePass').onclick=()=>{
+    const v=document.getElementById('newPass').value;
+    if(!v)return;
+    Askamore.setPassword(v);document.getElementById('newPass').value='';
+    const ok=document.getElementById('passOk');ok.style.display='inline';setTimeout(()=>ok.style.display='none',2000);
+  };
+</script>
 </body>
 </html>

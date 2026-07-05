@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galerie — Askamore Photography</title>
+<style>
+  :root{--bg:#0f0e0c;--bg2:#171512;--ink:#f4efe6;--muted:#b8ad9c;--gold:#c9a76a;--line:rgba(201,167,106,.25);--serif:'Playfair Display',Georgia,serif;--sans:'Inter',sans-serif}
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Playfair+Display:wght@400;500&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-weight:300}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 24px}
+  header.nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(15,14,12,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:76px}
+  .brand{font-family:var(--serif);font-size:24px;letter-spacing:.08em}.brand span{color:var(--gold)}
+  .nav-links{display:flex;gap:26px}.nav-links a{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .nav-links a:hover{color:var(--ink)}
+  .head{padding:150px 0 50px;text-align:center}
+  .eyebrow{letter-spacing:.35em;text-transform:uppercase;font-size:12px;color:var(--gold)}
+  .head h1{font-family:var(--serif);font-size:clamp(38px,6vw,68px);font-weight:500;margin:14px 0}
+  .head p{color:var(--muted)}
+  .grid{columns:2;column-gap:18px;padding-bottom:120px}
+  @media(max-width:700px){.grid{columns:1}.nav-links{display:none}}
+  .g-item{break-inside:avoid;margin-bottom:18px;border-radius:4px;overflow:hidden;background:#241f19}
+  .g-item img{width:100%;display:block;transition:.5s}
+  .g-item:hover img{transform:scale(1.04)}
+  .empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:60px 0}
+  .empty a{color:var(--gold)}
+</style>
+</head>
+<body>
+<header class="nav"><div class="wrap nav-inner">
+  <a href="index.html#top" class="brand">ASKA<span>MORE</span></a>
+  <nav class="nav-links">
+    <a href="index.html#galerie">Accueil</a>
+    <a href="gallery.html?cat=mariage">Mariage</a>
+    <a href="gallery.html?cat=fiancailles">Fiançailles</a>
+    <a href="gallery.html?cat=evenement">Événement</a>
+    <a href="admin.html">Admin</a>
+  </nav>
+</div></header>
+
+<div class="head wrap">
+  <div class="eyebrow">Galerie</div>
+  <h1 id="title">Galerie</h1>
+  <p id="sub">Nos plus beaux instants</p>
+</div>
+
+<div class="wrap"><div class="grid" id="grid"></div></div>
+
+<script src="data.js"></script>
+<script>
+  const id=new URLSearchParams(location.search).get('cat')||'mariage';
+  const cat=Askamore.getCategories().find(c=>c.id===id);
+  document.getElementById('title').textContent=cat?cat.name:'Galerie';
+  const photos=Askamore.getPhotos(id);
+  const grid=document.getElementById('grid');
+  if(!photos.length){
+    grid.innerHTML=`<div class="empty">Aucune photo pour cette galerie.<br>Ajoutez-en depuis l'<a href="admin.html">espace admin</a>.</div>`;
+  }else{
+    grid.innerHTML=photos.map(p=>`<div class="g-item"><img src="${p}" alt="${cat?cat.name:''}"></div>`).join('');
+  }
+</script>
+</body>
+</html>
