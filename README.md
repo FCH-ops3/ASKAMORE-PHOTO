@@ -1,0 +1,1 @@
+# ASKAMORE-PHOTO
