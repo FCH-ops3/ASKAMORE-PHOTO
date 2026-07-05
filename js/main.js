@@ -60,7 +60,7 @@
       if (!photos.length) {
         const empty = document.createElement("div");
         empty.className = "live-empty";
-        empty.innerHTML = '<span class="num">' + meta.numeral + '</span><span>Photos à venir</span>';
+        empty.innerHTML = '<span>Photos à venir</span>';
         panel.insertBefore(empty, panel.firstChild);
         if (counter) counter.remove();
         return;
