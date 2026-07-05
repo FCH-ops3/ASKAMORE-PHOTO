@@ -235,7 +235,7 @@
       row.style.gridTemplateColumns = "1fr auto";
       const mid = document.createElement("div");
       const date = r.date ? new Date(r.date).toLocaleDateString("fr-FR") : "";
-      mid.innerHTML = '<span class="cap-lbl"></span><div style="color:var(--ivory-dim);font-size:.92rem"></div>';
+      mid.innerHTML = '<span class="cap-lbl"></span><div style="color:var(--ink-soft);font-size:.92rem"></div>';
       $(".cap-lbl", mid).textContent = r.name + " · " + "★".repeat(r.rating) + " · " + date;
       $("div", mid).textContent = r.text;
       row.appendChild(mid);
