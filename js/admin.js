@@ -265,6 +265,13 @@
   }
 
   function initPublish() {
+    ghFillInputs();
+    ["gh-owner", "gh-repo", "gh-branch", "gh-token"].forEach(id => {
+      $("#" + id).addEventListener("change", ghReadInputs);
+    });
+    $("#btn-publish").addEventListener("click", publishOnline);
+    $("#btn-pull").addEventListener("click", pullOnline);
+
     $("#btn-export").addEventListener("click", () => {
       const data = { ...content, updatedAt: new Date().toISOString() };
       const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
@@ -293,6 +300,119 @@
       };
       reader.readAsText(file);
     });
+  }
+
+  /* ---------- Publication en ligne (GitHub) ---------- */
+  const GH_KEY = "askamore_github_cfg_v1";
+
+  function ghLoad() {
+    try {
+      const c = JSON.parse(localStorage.getItem(GH_KEY) || "{}");
+      return c && typeof c === "object" ? c : {};
+    } catch (e) { return {}; }
+  }
+  function ghDetect() {
+    const out = { owner: "", repo: "", branch: "main" };
+    const host = location.hostname;
+    if (host.endsWith(".github.io")) {
+      out.owner = host.replace(".github.io", "");
+      const segs = location.pathname.split("/").filter(Boolean);
+      if (segs.length > 1) out.repo = segs[0];
+    }
+    return out;
+  }
+  function ghFillInputs() {
+    const cfg = Object.assign(ghDetect(), ghLoad());
+    $("#gh-owner").value = cfg.owner || "";
+    $("#gh-repo").value = cfg.repo || "";
+    $("#gh-branch").value = cfg.branch || "main";
+    $("#gh-token").value = cfg.token || "";
+  }
+  function ghReadInputs() {
+    const cfg = {
+      owner: $("#gh-owner").value.trim(),
+      repo: $("#gh-repo").value.trim(),
+      branch: $("#gh-branch").value.trim() || "main",
+      token: $("#gh-token").value.trim()
+    };
+    localStorage.setItem(GH_KEY, JSON.stringify(cfg));
+    return cfg;
+  }
+  function blobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onerror = () => reject(new Error("Encodage impossible."));
+      r.onload = () => resolve(String(r.result).split(",")[1]);
+      r.readAsDataURL(blob);
+    });
+  }
+  function setPubStatus(msg, isError) {
+    const el = $("#publish-status");
+    el.textContent = msg;
+    el.style.color = isError ? "#b0503c" : "var(--champagne)";
+  }
+
+  async function publishOnline() {
+    const cfg = ghReadInputs();
+    if (!cfg.owner || !cfg.repo || !cfg.token) {
+      setPubStatus("Renseignez le compte GitHub, le nom du dépôt et la clé d'accès.", true);
+      return;
+    }
+    const headers = { "Authorization": "Bearer " + cfg.token, "Accept": "application/vnd.github+json" };
+    const base = "https://api.github.com/repos/" + cfg.owner + "/" + cfg.repo;
+    const btn = $("#btn-publish");
+    btn.disabled = true;
+    setPubStatus("Publication en cours\u2026");
+    try {
+      /* 1. Récupère l'empreinte (sha) du fichier photos.json actuel */
+      let sha = null;
+      const list = await fetch(base + "/contents/data?ref=" + encodeURIComponent(cfg.branch), { headers });
+      if (list.ok) {
+        const arr = await list.json();
+        const f = Array.isArray(arr) ? arr.find(x => x.name === "photos.json") : null;
+        if (f) sha = f.sha;
+      } else if (list.status === 401) {
+        throw new Error("Clé d'accès refusée : vérifiez le jeton collé ci-dessus.");
+      } else if (list.status === 404) {
+        throw new Error("Dépôt ou dossier data introuvable : vérifiez le compte, le dépôt et l'accès de la clé.");
+      } else {
+        throw new Error("Impossible de lire le dépôt (code " + list.status + ").");
+      }
+      /* 2. Envoie la nouvelle version */
+      const payload = Object.assign({}, content, { updatedAt: new Date().toISOString() });
+      const b64 = await blobToBase64(new Blob([JSON.stringify(payload)]));
+      const body = { message: "Mise à jour des photos depuis l'espace admin", content: b64, branch: cfg.branch };
+      if (sha) body.sha = sha;
+      const res = await fetch(base + "/contents/data/photos.json", {
+        method: "PUT", headers, body: JSON.stringify(body)
+      });
+      if (!res.ok) {
+        if (res.status === 401) throw new Error("Clé d'accès refusée : vérifiez le jeton.");
+        if (res.status === 404) throw new Error("La clé n'a pas accès en écriture à ce dépôt (permission Contents : Read and write).");
+        if (res.status === 409) throw new Error("Conflit de version : cliquez sur « Récupérer la version en ligne » puis republiez.");
+        throw new Error("Échec de la publication (code " + res.status + ").");
+      }
+      setPubStatus("Publié ! Les photos seront visibles par tous les visiteurs dans 1 à 2 minutes.");
+      toast("Photos publiées en ligne.");
+    } catch (err) {
+      setPubStatus(err.message || "Échec de la publication.", true);
+      toast("Échec de la publication.", true);
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  async function pullOnline() {
+    if (!confirm("Remplacer les photos de ce navigateur par la version en ligne du site ?")) return;
+    try {
+      const res = await fetch("data/photos.json?t=" + Date.now(), { cache: "no-store" });
+      if (!res.ok) throw new Error();
+      content = ASKAMORE.normalize(await res.json());
+      if (persist()) toast("Version en ligne récupérée.");
+      render();
+    } catch (e) {
+      toast("Impossible de récupérer la version en ligne.", true);
+    }
   }
 
   /* ---------- Onglet Sécurité ---------- */

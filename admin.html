@@ -131,12 +131,41 @@
         <!-- ===== Publication ===== -->
         <section class="admin-panel" data-panel="publish" style="display:none">
           <h2>Publication &amp; sauvegarde</h2>
-          <p class="lead">Les photos ajoutées ici sont d'abord enregistrées dans <strong>ce navigateur</strong>. Pour qu'elles soient visibles par tous les visiteurs du site, publiez-les en 3 étapes :</p>
-          <p class="lead">1. Cliquez sur « Exporter » pour télécharger le fichier <strong>photos.json</strong>.<br>
-             2. Sur GitHub, ouvrez le dossier <strong>data</strong> de votre dépôt.<br>
-             3. Remplacez le fichier <strong>photos.json</strong> existant par celui téléchargé (Add file → Upload files).</p>
+          <p class="lead">Les photos ajoutées sont d'abord enregistrées dans ce navigateur. Pour les rendre visibles par tous les visiteurs, publiez-les : le bouton ci-dessous envoie tout sur GitHub automatiquement.</p>
+
+          <h3>Publier en un clic</h3>
+          <p class="lead">Renseignez une seule fois la clé d'accès GitHub sur cet ordinateur, puis cliquez sur « Publier maintenant » après chaque modification. Le site est à jour au bout d'une à deux minutes.</p>
+          <div class="gh-grid">
+            <div class="field">
+              <label for="gh-owner">Compte GitHub</label>
+              <input type="text" id="gh-owner" placeholder="ex. : fch-ops3" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="gh-repo">Nom du dépôt</label>
+              <input type="text" id="gh-repo" placeholder="ex. : ASKAMORE-PHOTO" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="gh-branch">Branche</label>
+              <input type="text" id="gh-branch" placeholder="main" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="gh-token">Clé d'accès GitHub (jeton)</label>
+              <input type="password" id="gh-token" placeholder="github_pat_..." autocomplete="off">
+            </div>
+          </div>
           <div class="admin-toolbar">
-            <button class="btn btn--solid btn--sm" id="btn-export" type="button">Exporter (photos.json)</button>
+            <button class="btn btn--solid btn--sm" id="btn-publish" type="button">Publier maintenant</button>
+            <button class="btn btn--ghost btn--sm" id="btn-pull" type="button">Récupérer la version en ligne</button>
+          </div>
+          <p class="gauge-txt" id="publish-status" aria-live="polite"></p>
+          <div class="admin-note">
+            <strong>Créer la clé d'accès (une seule fois) :</strong> sur github.com → photo de profil → Settings → Developer settings → Personal access tokens → <strong>Fine-grained tokens</strong> → Generate new token. Donnez un nom (ex. « admin site »), une expiration (1 an), Repository access : <strong>Only select repositories</strong> → choisissez votre dépôt, puis Permissions → Contents : <strong>Read and write</strong>. Générez, copiez la clé (elle commence par github_pat_) et collez-la ci-dessus. Elle reste enregistrée uniquement dans ce navigateur — ne la partagez jamais, elle permet de modifier votre site.
+          </div>
+
+          <h3>Sauvegarde manuelle</h3>
+          <p class="lead">L'export télécharge le fichier photos.json (photos + avis) : conservez-en une copie, elle peut être réimportée ici depuis n'importe quel navigateur.</p>
+          <div class="admin-toolbar">
+            <button class="btn btn--ghost btn--sm" id="btn-export" type="button">Exporter (photos.json)</button>
             <label class="btn btn--ghost btn--sm file-btn">
               Importer une sauvegarde
               <input type="file" id="input-import" accept="application/json,.json">
@@ -145,9 +174,6 @@
           <div class="gauge">
             <div class="gauge-bar"><div class="gauge-fill" id="gauge-fill"></div></div>
             <p class="gauge-txt" id="gauge-txt"></p>
-          </div>
-          <div class="admin-note">
-            <strong>Bon à savoir :</strong> l'export sert aussi de sauvegarde. Conservez une copie du fichier photos.json — vous pourrez le réimporter ici depuis n'importe quel navigateur.
           </div>
         </section>
 

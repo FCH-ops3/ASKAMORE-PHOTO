@@ -499,6 +499,10 @@ input,select,textarea{font-family:inherit;font-size:1rem;color:inherit}
 .admin-main{padding:clamp(1.6rem,3.5vw,3rem) clamp(1.2rem,4vw,3.5rem)}
 .admin-main h2{font-family:var(--font-display);font-weight:500;font-size:2rem;margin-bottom:.4rem;color:var(--ink)}
 .admin-main .lead{color:var(--ink-soft);font-size:.92rem;max-width:44rem;margin-bottom:2rem}
+.admin-main h3{font-family:var(--font-display);font-weight:500;font-size:1.4rem;color:var(--ink);margin:2.4rem 0 .5rem}
+.admin-main h3:first-of-type{margin-top:0}
+.gh-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 1.4rem;max-width:580px}
+@media (max-width:640px){.gh-grid{grid-template-columns:1fr}}
 .admin-toolbar{display:flex;flex-wrap:wrap;gap:.8rem;align-items:center;margin-bottom:1.8rem}
 .file-btn input{display:none}
 
