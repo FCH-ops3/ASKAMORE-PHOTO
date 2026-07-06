@@ -231,8 +231,26 @@
     });
   }
 
+  /* ---------- Rideau d'ouverture ---------- */
+  function initIntro() {
+    const intro = $("#intro");
+    if (!intro) return;
+    if (reduceMotion) { intro.remove(); return; }
+    document.body.style.overflow = "hidden";
+    let done = false;
+    const end = () => {
+      if (done) return;
+      done = true;
+      intro.remove();
+      document.body.style.overflow = "";
+    };
+    intro.addEventListener("click", end);
+    setTimeout(end, 3000);
+  }
+
   /* ---------- Démarrage ---------- */
   document.addEventListener("DOMContentLoaded", async () => {
+    initIntro();
     initNav();
     initReveal();
     initContactForm();
