@@ -212,6 +212,8 @@
 
   /* ---------- Formulaire de contact (envoi direct par e-mail) ---------- */
   const CONTACT_EMAIL = "askamorephotography@outlook.fr";
+  /* Collez ici l'adresse de votre formulaire Formspree (ex. https://formspree.io/f/abcdwxyz) */
+  const FORMSPREE_ENDPOINT = "https://formspree.io/f/maqgkjzz";
 
   function initContactForm() {
     const form = $("#contact-form");
@@ -232,24 +234,21 @@
       btn.disabled = true;
       say("Envoi de votre demande en cours…");
       try {
-        const res = await fetch("https://formsubmit.co/ajax/" + CONTACT_EMAIL, {
+        if (FORMSPREE_ENDPOINT.indexOf("VOTRE-ID") !== -1) throw new Error("non configuré");
+        const res = await fetch(FORMSPREE_ENDPOINT, {
           method: "POST",
           headers: { "Content-Type": "application/json", "Accept": "application/json" },
           body: JSON.stringify({
             _subject: "Demande de renseignement — " + (type || "Prestation"),
-            _template: "table",
-            _captcha: "false",
-            _replyto: email,
-            "Nom": name,
-            "E-mail": email,
+            name: name,
+            email: email,
             "Prestation": type,
             "Date de l'événement": date || "Non précisée",
             "Localisation": lieu || "Non précisée",
-            "Message": msg
+            message: msg
           })
         });
-        const data = await res.json();
-        if (!res.ok || String(data.success) !== "true") throw new Error();
+        if (!res.ok) throw new Error();
         form.reset();
         say("Merci ! Votre demande a bien été envoyée — nous revenons vers vous rapidement.");
       } catch (err) {
