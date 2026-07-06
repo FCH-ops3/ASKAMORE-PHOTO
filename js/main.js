@@ -210,24 +210,65 @@
     });
   }
 
-  /* ---------- Formulaire de contact (ouvre l'application e-mail) ---------- */
+  /* ---------- Formulaire de contact (envoi direct par e-mail) ---------- */
+  const CONTACT_EMAIL = "askamorephotography@outlook.fr";
+
   function initContactForm() {
     const form = $("#contact-form");
     if (!form) return;
-    form.addEventListener("submit", e => {
+    const hint = $("#contact-hint");
+    const say = (msg, isError) => {
+      if (!hint) return;
+      hint.textContent = msg;
+      hint.style.color = isError ? "#b0503c" : "var(--champagne)";
+    };
+
+    form.addEventListener("submit", async e => {
       e.preventDefault();
       const v = id => ($("#" + id) ? $("#" + id).value.trim() : "");
-      const subject = "Demande de renseignement — " + (v("c-type") || "Prestation");
-      const body =
-        "Nom : " + v("c-name") +
-        "\nE-mail : " + v("c-email") +
-        "\nPrestation : " + v("c-type") +
-        "\nDate de l'événement : " + v("c-date") +
-        "\nLocalisation : " + v("c-lieu") +
-        "\n\nMessage :\n" + v("c-msg");
-      window.location.href = "mailto:askamorephotography@outlook.fr" +
-        "?subject=" + encodeURIComponent(subject) +
-        "&body=" + encodeURIComponent(body);
+      const name = v("c-name"), email = v("c-email"), type = v("c-type");
+      const date = v("c-date"), lieu = v("c-lieu"), msg = v("c-msg");
+      const btn = form.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      say("Envoi de votre demande en cours…");
+      try {
+        const res = await fetch("https://formsubmit.co/ajax/" + CONTACT_EMAIL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Accept": "application/json" },
+          body: JSON.stringify({
+            _subject: "Demande de renseignement — " + (type || "Prestation"),
+            _template: "table",
+            _captcha: "false",
+            _replyto: email,
+            "Nom": name,
+            "E-mail": email,
+            "Prestation": type,
+            "Date de l'événement": date || "Non précisée",
+            "Localisation": lieu || "Non précisée",
+            "Message": msg
+          })
+        });
+        const data = await res.json();
+        if (!res.ok || String(data.success) !== "true") throw new Error();
+        form.reset();
+        say("Merci ! Votre demande a bien été envoyée — nous revenons vers vous rapidement.");
+      } catch (err) {
+        /* Repli : ouverture de l'application e-mail du visiteur */
+        say("L'envoi direct est indisponible : ouverture de votre application e-mail…", true);
+        const subject = "Demande de renseignement — " + (type || "Prestation");
+        const body =
+          "Nom : " + name +
+          "\nE-mail : " + email +
+          "\nPrestation : " + type +
+          "\nDate de l'événement : " + date +
+          "\nLocalisation : " + lieu +
+          "\n\nMessage :\n" + msg;
+        window.location.href = "mailto:" + CONTACT_EMAIL +
+          "?subject=" + encodeURIComponent(subject) +
+          "&body=" + encodeURIComponent(body);
+      } finally {
+        btn.disabled = false;
+      }
     });
   }
 

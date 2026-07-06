@@ -105,8 +105,8 @@ input,select,textarea{font-family:inherit;font-size:1rem;color:inherit}
 .intro{
   position:fixed;inset:0;z-index:120;
   background:
-    radial-gradient(1000px 560px at 50% 28%,rgba(250,246,235,.18),transparent 65%),
-    linear-gradient(160deg,#bd9950 0%,#a8853d 45%,#876829 100%);
+    radial-gradient(1000px 560px at 72% 16%,rgba(201,164,92,.16),transparent 62%),
+    linear-gradient(180deg,var(--cream) 0%,var(--beige) 100%);
   display:flex;align-items:center;justify-content:center;cursor:pointer;
   animation:introOut .75s var(--ease) 2.15s forwards;
 }
@@ -117,17 +117,17 @@ input,select,textarea{font-family:inherit;font-size:1rem;color:inherit}
 .intro-inner{text-align:center;padding:0 6vw}
 .intro-brand{
   font-family:var(--font-display);font-weight:500;
-  font-size:clamp(2.1rem,6.5vw,3.8rem);color:var(--cream);line-height:1.15;
+  font-size:clamp(2.1rem,6.5vw,3.8rem);color:var(--ink);line-height:1.15;
   opacity:0;animation:introUp .95s var(--ease) .25s forwards;
 }
-.intro-brand em{font-style:italic;color:#2b2210}
+.intro-brand em{font-style:italic;color:var(--champagne)}
 .intro-sub{
   display:block;margin-top:.9rem;font-size:.72rem;font-weight:500;
-  letter-spacing:.32em;text-transform:uppercase;color:rgba(250,246,235,.85);
+  letter-spacing:.32em;text-transform:uppercase;color:var(--champagne);
   opacity:0;animation:introUp .95s var(--ease) .55s forwards;
 }
 .intro-line{
-  display:block;width:0;height:1px;background:rgba(250,246,235,.75);
+  display:block;width:0;height:1px;background:var(--champagne);
   margin:1.3rem auto;animation:introLine 1.1s var(--ease) .45s forwards;
 }
 @keyframes introUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
@@ -441,15 +441,14 @@ input,select,textarea{font-family:inherit;font-size:1rem;color:inherit}
 .page-hero h1 em{font-style:italic;color:var(--champagne)}
 .page-hero .intro{max-width:38rem;color:var(--ink-soft)}
 
-.masonry{columns:2;column-gap:clamp(1rem,2vw,1.5rem);opacity:1;transition:opacity .55s var(--ease)}
+.masonry{display:grid;grid-template-columns:1fr 1fr;gap:clamp(1rem,2vw,1.5rem);opacity:1;transition:opacity .55s var(--ease)}
 .masonry.loading{opacity:0;min-height:55vh}
 .ph-item{
-  position:relative;break-inside:avoid;margin-bottom:clamp(1rem,2vw,1.5rem);
-  overflow:hidden;background:var(--cream);border:1px solid var(--line);
+  position:relative;overflow:hidden;background:var(--cream);border:1px solid var(--line);
   cursor:zoom-in;padding:0;width:100%;display:block;text-align:inherit;color:inherit;
-  box-shadow:0 14px 34px -24px rgba(30,26,18,.5);
+  aspect-ratio:4/5;box-shadow:0 14px 34px -24px rgba(30,26,18,.5);
 }
-.ph-item img{width:100%;height:auto;transition:transform .8s var(--ease)}
+.ph-item img{width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease)}
 .ph-item:hover img{transform:scale(1.03)}
 .ph-item .cap{
   position:absolute;left:0;right:0;bottom:0;padding:2.4rem 1.2rem .95rem;
@@ -459,16 +458,15 @@ input,select,textarea{font-family:inherit;font-size:1rem;color:inherit}
 }
 .ph-item:hover .cap{opacity:1;transform:none}
 .ph-slot{
-  break-inside:avoid;margin-bottom:clamp(1rem,2vw,1.5rem);
   border:1px solid var(--line-gold);background:var(--cream);
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.7rem;
+  aspect-ratio:4/5;
 }
 .ph-slot .t{font-family:var(--font-display);font-style:italic;font-size:1.35rem;color:var(--champagne)}
 .ph-slot span{font-size:.64rem;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-soft)}
-.ph-slot:nth-child(3n+1){aspect-ratio:4/5}
-.ph-slot:nth-child(3n+2){aspect-ratio:3/2.6}
-.ph-slot:nth-child(3n){aspect-ratio:1/1}
-@media (max-width:640px){.masonry{columns:1}}
+@media (max-width:640px){
+  .masonry{grid-template-columns:1fr}
+}
 
 .cta-band{border-block:1px solid var(--line-gold);text-align:center;background:var(--cream)}
 .cta-band h2{font-family:var(--font-display);font-weight:500;font-size:clamp(1.9rem,4vw,2.8rem);margin:1rem 0 1.8rem;color:var(--ink)}
@@ -620,6 +618,6 @@ input,select,textarea{font-family:inherit;font-size:1rem;color:inherit}
 .footer p.desc{
   text-align:justify;
   text-justify:inter-word;
-  hyphens:auto;
-  -webkit-hyphens:auto;
+  hyphens:none;
+  -webkit-hyphens:none;
 }
