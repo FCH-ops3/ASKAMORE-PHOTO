@@ -144,7 +144,7 @@
     const emptyEl = $("#avis-empty");
     if (!list) return;
 
-    const reviews = ASKAMORE.mergedReviews(content);
+    const reviews = content.reviews || [];
     const n = reviews.length;
     const avg = n ? reviews.reduce((s, r) => s + r.rating, 0) / n : 5;
     if (scoreEl) scoreEl.textContent = avg.toFixed(1);
@@ -177,20 +177,36 @@
     starBtns.forEach((b, i) => b.addEventListener("click", () => { rating = i + 1; paint(); }));
     paint();
 
-    form.addEventListener("submit", e => {
+    form.addEventListener("submit", async e => {
       e.preventDefault();
       const name = $("#avis-name").value.trim();
       const service = $("#avis-service").value;
       const text = $("#avis-text").value.trim();
-      if (!name || !text) return;
-      const arr = ASKAMORE.localReviews();
-      arr.push({ id: ASKAMORE.uid(), name, service, rating, text, date: new Date().toISOString() });
-      try { ASKAMORE.saveLocalReviews(arr); } catch (err) { /* quota */ }
-      form.reset();
-      rating = 5; paint();
-      renderReviews(content);
       const ok = $("#avis-merci");
-      if (ok) { ok.style.display = "block"; setTimeout(() => ok.style.display = "none", 5000); }
+      if (!name || !text) return;
+      const btn = form.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      try {
+        await ASKAMORE.addReview({ name, service, rating, text });
+        content.reviews.unshift({ id: "tmp-" + Date.now(), name, service, rating, text, date: new Date().toISOString() });
+        renderReviews(content);
+        form.reset();
+        rating = 5; paint();
+        if (ok) {
+          ok.textContent = "Merci pour votre avis !";
+          ok.style.color = "var(--champagne)";
+          ok.style.display = "block";
+          setTimeout(() => ok.style.display = "none", 5000);
+        }
+      } catch (err) {
+        if (ok) {
+          ok.textContent = "Impossible d'envoyer l'avis pour le moment. Réessayez plus tard.";
+          ok.style.color = "#b0503c";
+          ok.style.display = "block";
+        }
+      } finally {
+        btn.disabled = false;
+      }
     });
   }
 

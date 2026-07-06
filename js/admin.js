@@ -1,7 +1,7 @@
 /* ============================================================
-   ASKAMORE — espace admin
-   Onglets : Accueil (photo À propos), 4 galeries, Avis,
-   Publication & sauvegarde, Sécurité.
+   ASKAMORE — espace admin (Supabase)
+   Connexion par e-mail + mot de passe. Toute modification est
+   enregistrée en ligne et visible immédiatement par tous.
    ============================================================ */
 (function () {
   const $  = (sel, root) => (root || document).querySelector(sel);
@@ -9,6 +9,8 @@
 
   let content = ASKAMORE.emptyContent();
   let activeTab = "about";
+  const sb = () => ASKAMORE.sb();
+  const BUCKET = "photos";
 
   /* ---------- Notifications ---------- */
   let toastTimer = null;
@@ -18,17 +20,21 @@
     el.classList.toggle("err", !!isError);
     el.classList.add("show");
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => el.classList.remove("show"), 3200);
+    toastTimer = setTimeout(() => el.classList.remove("show"), 3600);
+  }
+  function failMsg(error, fallback) {
+    return (error && error.message) ? fallback + " (" + error.message + ")" : fallback;
   }
 
-  function persist() {
-    try {
-      ASKAMORE.saveContent(content);
-      return true;
-    } catch (e) {
-      toast("Stockage du navigateur plein : supprimez quelques photos ou exportez vos données.", true);
-      return false;
-    }
+  /* ---------- Aides Supabase ---------- */
+  async function uploadBlob(path, blob) {
+    const up = await sb().storage.from(BUCKET).upload(path, blob, { contentType: "image/jpeg" });
+    if (up.error) throw up.error;
+    return sb().storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+  }
+  async function removeFile(path) {
+    if (!path) return;
+    try { await sb().storage.from(BUCKET).remove([path]); } catch (e) { /* non bloquant */ }
   }
 
   /* ---------- Connexion ---------- */
@@ -40,52 +46,58 @@
     $("#admin-login").style.display = "none";
     $("#admin-shell").classList.add("on");
     content = await ASKAMORE.loadContent();
-    /* Intègre les avis déposés depuis ce navigateur dans le contenu géré */
-    const merged = ASKAMORE.mergedReviews(content);
-    if (merged.length !== (content.reviews || []).length) {
-      content.reviews = merged;
-    }
     render();
+  }
+  function configMissing() {
+    if (sb()) return false;
+    $("#login-error").textContent =
+      "Configuration manquante : renseignez l'adresse du projet et la clé dans le fichier js/config.js.";
+    return true;
   }
 
   function initLogin() {
-    const form = $("#login-form");
-    form.addEventListener("submit", async e => {
+    $("#login-form").addEventListener("submit", async e => {
       e.preventDefault();
-      const pw = $("#login-pass").value;
       const err = $("#login-error");
       err.textContent = "";
-      if (await ASKAMORE.checkPassword(pw)) {
-        sessionStorage.setItem(ASKAMORE.SESSION_KEY, "1");
-        $("#login-pass").value = "";
-        showDashboard();
-      } else {
-        err.textContent = "Mot de passe incorrect.";
+      if (configMissing()) return;
+      const { error } = await sb().auth.signInWithPassword({
+        email: $("#login-email").value.trim(),
+        password: $("#login-pass").value
+      });
+      if (error) {
+        err.textContent = "E-mail ou mot de passe incorrect.";
+        return;
       }
+      $("#login-pass").value = "";
+      showDashboard();
     });
-    $("#btn-logout").addEventListener("click", () => {
-      sessionStorage.removeItem(ASKAMORE.SESSION_KEY);
+    $("#btn-logout").addEventListener("click", async () => {
+      try { await sb().auth.signOut(); } catch (e) { /* ignoré */ }
       showLogin();
     });
+  }
+
+  async function checkSession() {
+    if (!sb()) { showLogin(); configMissing(); return; }
+    try {
+      const { data } = await sb().auth.getSession();
+      data && data.session ? showDashboard() : showLogin();
+    } catch (e) { showLogin(); }
   }
 
   /* ---------- Onglets ---------- */
   function initTabs() {
     $$(".admin-nav button").forEach(btn => {
-      btn.addEventListener("click", () => {
-        activeTab = btn.dataset.tab;
-        render();
-      });
+      btn.addEventListener("click", () => { activeTab = btn.dataset.tab; render(); });
     });
   }
-
   function render() {
     $$(".admin-nav button").forEach(b => b.classList.toggle("active", b.dataset.tab === activeTab));
     $$(".admin-panel").forEach(p => p.style.display = p.dataset.panel === activeTab ? "" : "none");
     if (activeTab === "about") renderAbout();
     else if (ASKAMORE.CATEGORIES[activeTab]) renderGalleryTab(activeTab);
     else if (activeTab === "avis") renderAvis();
-    else if (activeTab === "publish") renderPublish();
   }
 
   /* ---------- Onglet Accueil : photo « À propos de nous » ---------- */
@@ -99,9 +111,9 @@
       holder.appendChild(img);
       $("#btn-about-delete").style.display = "";
     } else {
-      holder.innerHTML = '<div class="about-photo-empty" style="border-color:var(--line)">' +
-        '<span class="mono" style="color:var(--champagne)">F · G</span>' +
-        '<span style="color:var(--stone)">Aucune photo</span></div>';
+      holder.innerHTML = '<div class="about-photo-empty">' +
+        '<span class="mono">F · G</span>' +
+        '<span>Aucune photo</span></div>';
       $("#btn-about-delete").style.display = "none";
     }
   }
@@ -111,19 +123,41 @@
       const file = e.target.files[0];
       e.target.value = "";
       if (!file) return;
+      toast("Envoi de la photo en cours…");
       try {
-        content.aboutPhoto = await ASKAMORE.compressImage(file, 1400, 0.84);
-        if (persist()) toast("Photo « À propos » mise à jour.");
+        const blob = await ASKAMORE.compressImage(file, 1400, 0.84);
+        const path = "about/about-" + ASKAMORE.uid() + ".jpg";
+        const url = await uploadBlob(path, blob);
+        const { error } = await sb().from("settings").upsert([
+          { key: "about_photo", value: url },
+          { key: "about_photo_path", value: path }
+        ]);
+        if (error) throw error;
+        await removeFile(content.aboutPath);
+        content.aboutPhoto = url;
+        content.aboutPath = path;
+        toast("Photo « À propos » mise à jour — visible par tous.");
         renderAbout();
       } catch (err) {
-        toast(err.message || "Impossible de lire cette image.", true);
+        toast(failMsg(err, "Impossible d'envoyer cette photo."), true);
       }
     });
-    $("#btn-about-delete").addEventListener("click", () => {
+    $("#btn-about-delete").addEventListener("click", async () => {
       if (!confirm("Supprimer la photo de la section « À propos de nous » ?")) return;
-      content.aboutPhoto = null;
-      if (persist()) toast("Photo supprimée.");
-      renderAbout();
+      try {
+        const { error } = await sb().from("settings").upsert([
+          { key: "about_photo", value: null },
+          { key: "about_photo_path", value: null }
+        ]);
+        if (error) throw error;
+        await removeFile(content.aboutPath);
+        content.aboutPhoto = null;
+        content.aboutPath = null;
+        toast("Photo supprimée.");
+        renderAbout();
+      } catch (err) {
+        toast(failMsg(err, "Suppression impossible."), true);
+      }
     });
   }
 
@@ -156,9 +190,15 @@
       input.type = "text";
       input.value = p.caption || "";
       input.placeholder = "Ex. : Première danse";
-      input.addEventListener("change", () => {
-        p.caption = input.value.trim();
-        if (persist()) toast("Légende enregistrée.");
+      input.addEventListener("change", async () => {
+        try {
+          const { error } = await sb().from("photos").update({ caption: input.value.trim() }).eq("id", p.id);
+          if (error) throw error;
+          p.caption = input.value.trim();
+          toast("Légende enregistrée.");
+        } catch (err) {
+          toast(failMsg(err, "Enregistrement impossible."), true);
+        }
       });
       mid.appendChild(input);
       row.appendChild(mid);
@@ -167,11 +207,18 @@
       actions.className = "item-actions";
       actions.appendChild(iconBtn("↑", "Monter", () => move(cat, i, -1)));
       actions.appendChild(iconBtn("↓", "Descendre", () => move(cat, i, 1)));
-      actions.appendChild(iconBtn("✕", "Supprimer", () => {
+      actions.appendChild(iconBtn("✕", "Supprimer", async () => {
         if (!confirm("Supprimer cette photo ?")) return;
-        photos.splice(i, 1);
-        if (persist()) toast("Photo supprimée.");
-        renderGalleryTab(cat);
+        try {
+          const { error } = await sb().from("photos").delete().eq("id", p.id);
+          if (error) throw error;
+          await removeFile(p.path);
+          photos.splice(i, 1);
+          toast("Photo supprimée.");
+          renderGalleryTab(cat);
+        } catch (err) {
+          toast(failMsg(err, "Suppression impossible."), true);
+        }
       }, true));
       row.appendChild(actions);
 
@@ -190,12 +237,34 @@
     return b;
   }
 
-  function move(cat, i, dir) {
+  async function move(cat, i, dir) {
     const arr = content.photos[cat];
     const j = i + dir;
     if (j < 0 || j >= arr.length) return;
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-    if (persist()) renderGalleryTab(cat);
+    const a = arr[i], b = arr[j];
+    const posA = a.position, posB = b.position;
+    try {
+      const r1 = await sb().from("photos").update({ position: posB }).eq("id", a.id);
+      const r2 = await sb().from("photos").update({ position: posA }).eq("id", b.id);
+      if (r1.error || r2.error) throw (r1.error || r2.error);
+      a.position = posB; b.position = posA;
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+      renderGalleryTab(cat);
+    } catch (err) {
+      toast(failMsg(err, "Déplacement impossible."), true);
+    }
+  }
+
+  async function addPhotoToCategory(cat, blob, caption) {
+    const path = cat + "/" + ASKAMORE.uid() + ".jpg";
+    const url = await uploadBlob(path, blob);
+    const arr = content.photos[cat];
+    const position = arr.length ? Math.max.apply(null, arr.map(p => p.position || 0)) + 1 : 1;
+    const ins = await sb().from("photos")
+      .insert({ category: cat, url: url, path: path, caption: caption || "", position: position })
+      .select().single();
+    if (ins.error) throw ins.error;
+    arr.push({ id: ins.data.id, src: url, path: path, caption: caption || "", position: position });
   }
 
   function initGalleryInputs() {
@@ -206,17 +275,19 @@
         const files = Array.from(e.target.files || []);
         e.target.value = "";
         if (!files.length) return;
-        toast("Ajout de " + files.length + " photo(s) en cours…");
         let added = 0;
         for (const file of files) {
+          toast("Envoi " + (added + 1) + " / " + files.length + "…");
           try {
-            const src = await ASKAMORE.compressImage(file, 1600, 0.82);
-            content.photos[cat].push({ id: ASKAMORE.uid(), src, caption: "" });
+            const blob = await ASKAMORE.compressImage(file, 1600, 0.82);
+            await addPhotoToCategory(cat, blob, "");
             added++;
-          } catch (err) { /* fichier ignoré */ }
+            renderGalleryTab(cat);
+          } catch (err) {
+            toast(failMsg(err, "Une photo n'a pas pu être envoyée."), true);
+          }
         }
-        if (persist()) toast(added + " photo(s) ajoutée(s) à « " + ASKAMORE.CATEGORIES[cat].label + " ».");
-        renderGalleryTab(cat);
+        if (added) toast(added + " photo(s) en ligne dans « " + ASKAMORE.CATEGORIES[cat].label + " » — visibles par tous.");
       });
     });
   }
@@ -241,195 +312,139 @@
       row.appendChild(mid);
       const actions = document.createElement("div");
       actions.className = "item-actions";
-      actions.appendChild(iconBtn("✕", "Supprimer cet avis", () => {
+      actions.appendChild(iconBtn("✕", "Supprimer cet avis", async () => {
         if (!confirm("Supprimer cet avis ?")) return;
-        content.reviews.splice(i, 1);
-        /* retire aussi l'avis de la liste locale du navigateur */
-        ASKAMORE.saveLocalReviews(ASKAMORE.localReviews().filter(x => x.id !== r.id));
-        if (persist()) toast("Avis supprimé.");
-        renderAvis();
+        try {
+          const { error } = await sb().from("reviews").delete().eq("id", r.id);
+          if (error) throw error;
+          content.reviews.splice(i, 1);
+          toast("Avis supprimé.");
+          renderAvis();
+        } catch (err) {
+          toast(failMsg(err, "Suppression impossible."), true);
+        }
       }, true));
       row.appendChild(actions);
       list.appendChild(row);
     });
   }
 
-  /* ---------- Onglet Publication & sauvegarde ---------- */
-  function renderPublish() {
-    const size = new Blob([JSON.stringify(content)]).size;
-    const max = 5 * 1024 * 1024;
-    const pct = Math.min(100, Math.round((size / max) * 100));
-    $("#gauge-fill").style.width = pct + "%";
-    $("#gauge-txt").textContent =
-      (size / (1024 * 1024)).toFixed(2) + " Mo utilisés sur environ 5 Mo de stockage navigateur (" + pct + " %).";
-  }
-
-  function initPublish() {
-    ghFillInputs();
-    ["gh-owner", "gh-repo", "gh-branch", "gh-token"].forEach(id => {
-      $("#" + id).addEventListener("change", ghReadInputs);
-    });
-    $("#btn-publish").addEventListener("click", publishOnline);
-    $("#btn-pull").addEventListener("click", pullOnline);
-
-    $("#btn-export").addEventListener("click", () => {
-      const data = { ...content, updatedAt: new Date().toISOString() };
-      const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "photos.json";
-      a.click();
-      URL.revokeObjectURL(a.href);
-      toast("Fichier photos.json téléchargé.");
-    });
-
-    $("#input-import").addEventListener("change", e => {
-      const file = e.target.files[0];
-      e.target.value = "";
-      if (!file) return;
-      if (!confirm("Importer ce fichier remplacera les photos et avis actuels de ce navigateur. Continuer ?")) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        try {
-          content = ASKAMORE.normalize(JSON.parse(reader.result));
-          if (persist()) toast("Données importées.");
-          render();
-        } catch (err) {
-          toast("Fichier invalide : impossible de l'importer.", true);
-        }
-      };
-      reader.readAsText(file);
-    });
-  }
-
-  /* ---------- Publication en ligne (GitHub) ---------- */
-  const GH_KEY = "askamore_github_cfg_v1";
-
-  function ghLoad() {
-    try {
-      const c = JSON.parse(localStorage.getItem(GH_KEY) || "{}");
-      return c && typeof c === "object" ? c : {};
-    } catch (e) { return {}; }
-  }
-  function ghDetect() {
-    const out = { owner: "", repo: "", branch: "main" };
-    const host = location.hostname;
-    if (host.endsWith(".github.io")) {
-      out.owner = host.replace(".github.io", "");
-      const segs = location.pathname.split("/").filter(Boolean);
-      if (segs.length > 1) out.repo = segs[0];
-    }
-    return out;
-  }
-  function ghFillInputs() {
-    const cfg = Object.assign(ghDetect(), ghLoad());
-    $("#gh-owner").value = cfg.owner || "";
-    $("#gh-repo").value = cfg.repo || "";
-    $("#gh-branch").value = cfg.branch || "main";
-    $("#gh-token").value = cfg.token || "";
-  }
-  function ghReadInputs() {
-    const cfg = {
-      owner: $("#gh-owner").value.trim(),
-      repo: $("#gh-repo").value.trim(),
-      branch: $("#gh-branch").value.trim() || "main",
-      token: $("#gh-token").value.trim()
-    };
-    localStorage.setItem(GH_KEY, JSON.stringify(cfg));
-    return cfg;
-  }
-  function blobToBase64(blob) {
-    return new Promise((resolve, reject) => {
-      const r = new FileReader();
-      r.onerror = () => reject(new Error("Encodage impossible."));
-      r.onload = () => resolve(String(r.result).split(",")[1]);
-      r.readAsDataURL(blob);
-    });
-  }
-  function setPubStatus(msg, isError) {
-    const el = $("#publish-status");
+  /* ---------- Onglet Sauvegarde : import de l'ancienne version ---------- */
+  function setBackupStatus(msg, isError) {
+    const el = $("#backup-status");
     el.textContent = msg;
     el.style.color = isError ? "#b0503c" : "var(--champagne)";
   }
 
-  async function publishOnline() {
-    const cfg = ghReadInputs();
-    if (!cfg.owner || !cfg.repo || !cfg.token) {
-      setPubStatus("Renseignez le compte GitHub, le nom du dépôt et la clé d'accès.", true);
+  async function importLegacy(data) {
+    const normPhotos = (data && data.photos && typeof data.photos === "object") ? data.photos : {};
+    const cats = Object.keys(ASKAMORE.CATEGORIES);
+    let total = 0;
+    cats.forEach(c => { total += Array.isArray(normPhotos[c]) ? normPhotos[c].length : 0; });
+    if (data && typeof data.aboutPhoto === "string" && data.aboutPhoto) total++;
+    const reviews = Array.isArray(data && data.reviews) ? data.reviews : [];
+    if (!total && !reviews.length) {
+      setBackupStatus("Aucune photo ni avis trouvés dans cette sauvegarde.", true);
       return;
     }
-    const headers = { "Authorization": "Bearer " + cfg.token, "Accept": "application/vnd.github+json" };
-    const base = "https://api.github.com/repos/" + cfg.owner + "/" + cfg.repo;
-    const btn = $("#btn-publish");
-    btn.disabled = true;
-    setPubStatus("Publication en cours\u2026");
-    try {
-      /* 1. Récupère l'empreinte (sha) du fichier photos.json actuel */
-      let sha = null;
-      const list = await fetch(base + "/contents/data?ref=" + encodeURIComponent(cfg.branch), { headers });
-      if (list.ok) {
-        const arr = await list.json();
-        const f = Array.isArray(arr) ? arr.find(x => x.name === "photos.json") : null;
-        if (f) sha = f.sha;
-      } else if (list.status === 401) {
-        throw new Error("Clé d'accès refusée : vérifiez le jeton collé ci-dessus.");
-      } else if (list.status === 404) {
-        throw new Error("Dépôt ou dossier data introuvable : vérifiez le compte, le dépôt et l'accès de la clé.");
-      } else {
-        throw new Error("Impossible de lire le dépôt (code " + list.status + ").");
+    if (!confirm("Envoyer en ligne " + total + " photo(s) et " + reviews.length + " avis ? Les photos déjà en ligne sont conservées.")) return;
+
+    let done = 0, failed = 0;
+    for (const cat of cats) {
+      const arr = Array.isArray(normPhotos[cat]) ? normPhotos[cat] : [];
+      for (const p of arr) {
+        if (!p || typeof p.src !== "string") continue;
+        setBackupStatus("Envoi des photos : " + (done + 1) + " / " + total + "…");
+        try {
+          const blob = await (await fetch(p.src)).blob();
+          await addPhotoToCategory(cat, blob, p.caption || "");
+          done++;
+        } catch (e) { failed++; }
       }
-      /* 2. Envoie la nouvelle version */
-      const payload = Object.assign({}, content, { updatedAt: new Date().toISOString() });
-      const b64 = await blobToBase64(new Blob([JSON.stringify(payload)]));
-      const body = { message: "Mise à jour des photos depuis l'espace admin", content: b64, branch: cfg.branch };
-      if (sha) body.sha = sha;
-      const res = await fetch(base + "/contents/data/photos.json", {
-        method: "PUT", headers, body: JSON.stringify(body)
-      });
-      if (!res.ok) {
-        if (res.status === 401) throw new Error("Clé d'accès refusée : vérifiez le jeton.");
-        if (res.status === 404) throw new Error("La clé n'a pas accès en écriture à ce dépôt (permission Contents : Read and write).");
-        if (res.status === 409) throw new Error("Conflit de version : cliquez sur « Récupérer la version en ligne » puis republiez.");
-        throw new Error("Échec de la publication (code " + res.status + ").");
-      }
-      setPubStatus("Publié ! Les photos seront visibles par tous les visiteurs dans 1 à 2 minutes.");
-      toast("Photos publiées en ligne.");
-    } catch (err) {
-      setPubStatus(err.message || "Échec de la publication.", true);
-      toast("Échec de la publication.", true);
-    } finally {
-      btn.disabled = false;
     }
+    if (data && typeof data.aboutPhoto === "string" && data.aboutPhoto) {
+      setBackupStatus("Envoi de la photo « À propos »…");
+      try {
+        const blob = await (await fetch(data.aboutPhoto)).blob();
+        const path = "about/about-" + ASKAMORE.uid() + ".jpg";
+        const url = await uploadBlob(path, blob);
+        await sb().from("settings").upsert([
+          { key: "about_photo", value: url },
+          { key: "about_photo_path", value: path }
+        ]);
+        content.aboutPhoto = url;
+        content.aboutPath = path;
+        done++;
+      } catch (e) { failed++; }
+    }
+    for (const r of reviews) {
+      if (!r || !r.name || !r.text) continue;
+      try {
+        await sb().from("reviews").insert({
+          name: String(r.name), service: String(r.service || ""),
+          rating: Math.min(5, Math.max(1, parseInt(r.rating, 10) || 5)),
+          text: String(r.text)
+        });
+      } catch (e) { /* avis ignoré */ }
+    }
+    content = await ASKAMORE.loadContent();
+    render();
+    setBackupStatus(failed
+      ? done + " élément(s) importé(s), " + failed + " en échec."
+      : "Import terminé : tout est en ligne et visible par les visiteurs.", failed > 0);
+    toast("Import terminé.");
   }
 
-  async function pullOnline() {
-    if (!confirm("Remplacer les photos de ce navigateur par la version en ligne du site ?")) return;
-    try {
-      const res = await fetch("data/photos.json?t=" + Date.now(), { cache: "no-store" });
-      if (!res.ok) throw new Error();
-      content = ASKAMORE.normalize(await res.json());
-      if (persist()) toast("Version en ligne récupérée.");
-      render();
-    } catch (e) {
-      toast("Impossible de récupérer la version en ligne.", true);
-    }
+  function initBackup() {
+    $("#btn-import-local").addEventListener("click", () => {
+      let old = null;
+      try { old = JSON.parse(localStorage.getItem("askamore_content_v1") || "null"); } catch (e) { old = null; }
+      if (!old) {
+        setBackupStatus("Aucune donnée de l'ancienne version dans ce navigateur.", true);
+        return;
+      }
+      importLegacy(old);
+    });
+    $("#input-import").addEventListener("change", e => {
+      const file = e.target.files[0];
+      e.target.value = "";
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try { importLegacy(JSON.parse(reader.result)); }
+        catch (err) { setBackupStatus("Fichier invalide : impossible de le lire.", true); }
+      };
+      reader.readAsText(file);
+    });
+    $("#btn-export").addEventListener("click", () => {
+      const data = {
+        photos: content.photos, aboutPhoto: content.aboutPhoto,
+        reviews: content.reviews, exportedAt: new Date().toISOString()
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "sauvegarde-askamore.json";
+      a.click();
+      URL.revokeObjectURL(a.href);
+      toast("Copie de secours téléchargée.");
+    });
   }
 
   /* ---------- Onglet Sécurité ---------- */
   function initSecurity() {
     $("#pass-form").addEventListener("submit", async e => {
       e.preventDefault();
-      const cur = $("#pass-current").value;
       const n1 = $("#pass-new").value;
       const n2 = $("#pass-new2").value;
       const err = $("#pass-error");
       err.textContent = "";
-      if (!(await ASKAMORE.checkPassword(cur))) { err.textContent = "Mot de passe actuel incorrect."; return; }
-      if (n1.length < 6) { err.textContent = "Le nouveau mot de passe doit contenir au moins 6 caractères."; return; }
+      if (n1.length < 8) { err.textContent = "Le mot de passe doit contenir au moins 8 caractères."; return; }
       if (n1 !== n2) { err.textContent = "Les deux saisies ne correspondent pas."; return; }
-      await ASKAMORE.setPassword(n1);
+      const { error } = await sb().auth.updateUser({ password: n1 });
+      if (error) { err.textContent = "Modification impossible : " + error.message; return; }
       e.target.reset();
-      toast("Mot de passe modifié pour ce navigateur.");
+      toast("Mot de passe modifié.");
     });
   }
 
@@ -439,9 +454,8 @@
     initTabs();
     initAbout();
     initGalleryInputs();
-    initPublish();
+    initBackup();
     initSecurity();
-    if (sessionStorage.getItem(ASKAMORE.SESSION_KEY) === "1") showDashboard();
-    else showLogin();
+    checkSession();
   });
 })();

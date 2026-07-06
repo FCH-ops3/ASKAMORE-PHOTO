@@ -19,6 +19,10 @@
       <p class="sub">Espace admin</p>
       <form id="login-form">
         <div class="field field--dark">
+          <label for="login-email">E-mail</label>
+          <input type="email" id="login-email" required autocomplete="username">
+        </div>
+        <div class="field field--dark">
           <label for="login-pass">Mot de passe</label>
           <input type="password" id="login-pass" required autocomplete="current-password">
         </div>
@@ -50,7 +54,7 @@
         <button data-tab="seance" type="button">Séance photo</button>
         <p class="group">Gestion</p>
         <button data-tab="avis" type="button">Avis</button>
-        <button data-tab="publish" type="button">Publication</button>
+        <button data-tab="backup" type="button">Sauvegarde</button>
         <button data-tab="security" type="button">Sécurité</button>
       </nav>
 
@@ -128,77 +132,47 @@
           <div class="admin-items" id="admin-avis-list"></div>
         </section>
 
-        <!-- ===== Publication ===== -->
-        <section class="admin-panel" data-panel="publish" style="display:none">
-          <h2>Publication &amp; sauvegarde</h2>
-          <p class="lead">Les photos ajoutées sont d'abord enregistrées dans ce navigateur. Pour les rendre visibles par tous les visiteurs, publiez-les : le bouton ci-dessous envoie tout sur GitHub automatiquement.</p>
+        <!-- ===== Sauvegarde ===== -->
+        <section class="admin-panel" data-panel="backup" style="display:none">
+          <h2>Sauvegarde</h2>
+          <p class="lead">Les photos et avis sont enregistrés en ligne : chaque modification faite ici est immédiatement visible par tous les visiteurs, depuis n'importe quel appareil. Rien à publier.</p>
 
-          <h3>Publier en un clic</h3>
-          <p class="lead">Renseignez une seule fois la clé d'accès GitHub sur cet ordinateur, puis cliquez sur « Publier maintenant » après chaque modification. Le site est à jour au bout d'une à deux minutes.</p>
-          <div class="gh-grid">
-            <div class="field">
-              <label for="gh-owner">Compte GitHub</label>
-              <input type="text" id="gh-owner" placeholder="ex. : fch-ops3" autocomplete="off">
-            </div>
-            <div class="field">
-              <label for="gh-repo">Nom du dépôt</label>
-              <input type="text" id="gh-repo" placeholder="ex. : ASKAMORE-PHOTO" autocomplete="off">
-            </div>
-            <div class="field">
-              <label for="gh-branch">Branche</label>
-              <input type="text" id="gh-branch" placeholder="main" autocomplete="off">
-            </div>
-            <div class="field">
-              <label for="gh-token">Clé d'accès GitHub (jeton)</label>
-              <input type="password" id="gh-token" placeholder="github_pat_..." autocomplete="off">
-            </div>
-          </div>
+          <h3>Récupérer les photos de l'ancienne version</h3>
+          <p class="lead">Si vous aviez ajouté des photos avec l'ancienne version du site, vous pouvez les envoyer en ligne : soit depuis ce navigateur, soit depuis un fichier photos.json exporté à l'époque.</p>
           <div class="admin-toolbar">
-            <button class="btn btn--solid btn--sm" id="btn-publish" type="button">Publier maintenant</button>
-            <button class="btn btn--ghost btn--sm" id="btn-pull" type="button">Récupérer la version en ligne</button>
-          </div>
-          <p class="gauge-txt" id="publish-status" aria-live="polite"></p>
-          <div class="admin-note">
-            <strong>Créer la clé d'accès (une seule fois) :</strong> sur github.com → photo de profil → Settings → Developer settings → Personal access tokens → <strong>Fine-grained tokens</strong> → Generate new token. Donnez un nom (ex. « admin site »), une expiration (1 an), Repository access : <strong>Only select repositories</strong> → choisissez votre dépôt, puis Permissions → Contents : <strong>Read and write</strong>. Générez, copiez la clé (elle commence par github_pat_) et collez-la ci-dessus. Elle reste enregistrée uniquement dans ce navigateur — ne la partagez jamais, elle permet de modifier votre site.
-          </div>
-
-          <h3>Sauvegarde manuelle</h3>
-          <p class="lead">L'export télécharge le fichier photos.json (photos + avis) : conservez-en une copie, elle peut être réimportée ici depuis n'importe quel navigateur.</p>
-          <div class="admin-toolbar">
-            <button class="btn btn--ghost btn--sm" id="btn-export" type="button">Exporter (photos.json)</button>
+            <button class="btn btn--solid btn--sm" id="btn-import-local" type="button">Importer depuis ce navigateur</button>
             <label class="btn btn--ghost btn--sm file-btn">
-              Importer une sauvegarde
+              Importer un fichier photos.json
               <input type="file" id="input-import" accept="application/json,.json">
             </label>
           </div>
-          <div class="gauge">
-            <div class="gauge-bar"><div class="gauge-fill" id="gauge-fill"></div></div>
-            <p class="gauge-txt" id="gauge-txt"></p>
+          <p class="gauge-txt" id="backup-status" aria-live="polite"></p>
+
+          <h3>Copie de secours</h3>
+          <p class="lead">Télécharge la liste des photos (liens) et des avis actuellement en ligne, à conserver comme trace.</p>
+          <div class="admin-toolbar">
+            <button class="btn btn--ghost btn--sm" id="btn-export" type="button">Exporter une copie</button>
           </div>
         </section>
 
         <!-- ===== Sécurité ===== -->
         <section class="admin-panel" data-panel="security" style="display:none">
           <h2>Sécurité</h2>
-          <p class="lead">Modifiez le mot de passe d'accès à cet espace admin.</p>
+          <p class="lead">Modifiez le mot de passe de votre compte admin. Le changement s'applique partout, sur tous les appareils.</p>
           <form id="pass-form" style="max-width:380px">
             <div class="field field--dark">
-              <label for="pass-current">Mot de passe actuel</label>
-              <input type="password" id="pass-current" required autocomplete="current-password">
-            </div>
-            <div class="field field--dark">
               <label for="pass-new">Nouveau mot de passe</label>
-              <input type="password" id="pass-new" required minlength="6" autocomplete="new-password">
+              <input type="password" id="pass-new" required minlength="8" autocomplete="new-password">
             </div>
             <div class="field field--dark">
               <label for="pass-new2">Confirmer le nouveau mot de passe</label>
-              <input type="password" id="pass-new2" required minlength="6" autocomplete="new-password">
+              <input type="password" id="pass-new2" required minlength="8" autocomplete="new-password">
             </div>
             <button class="btn btn--solid btn--sm" type="submit">Modifier le mot de passe</button>
             <p class="login-error" id="pass-error"></p>
           </form>
           <div class="admin-note">
-            <strong>Important :</strong> ce mot de passe est enregistré dans le navigateur utilisé. Sur un site statique (GitHub Pages), il s'agit d'une protection de confort : ne stockez jamais d'informations sensibles dans cet espace. Le mot de passe par défaut peut être changé durablement dans le fichier <strong>js/data.js</strong> (ligne DEFAULT_PASSWORD).
+            <strong>Bon à savoir :</strong> les comptes admin se gèrent dans votre tableau de bord Supabase (Authentication → Users) : vous pouvez y ajouter un second compte ou réinitialiser un mot de passe oublié.
           </div>
         </section>
 
@@ -208,6 +182,8 @@
 
   <div class="toast" id="toast" role="status"></div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
   <script src="js/data.js"></script>
   <script src="js/admin.js"></script>
 </body>
