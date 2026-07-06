@@ -77,8 +77,19 @@
   document.addEventListener("DOMContentLoaded", async () => {
     const cat = document.body.dataset.cat;
     if (!cat) return;
+    const grid = $("#gallery-grid");
+    if (grid) grid.classList.add("loading");
     const content = await ASKAMORE.loadContent();
     renderGrid(content, cat);
+    if (grid) {
+      /* attend le décodage des premières images pour éviter les sauts de mise en page */
+      const imgs = Array.from(grid.querySelectorAll("img")).slice(0, 8);
+      await Promise.race([
+        Promise.allSettled(imgs.map(im => (im.decode ? im.decode().catch(() => {}) : Promise.resolve()))),
+        new Promise(r => setTimeout(r, 2200))
+      ]);
+      grid.classList.remove("loading");
+    }
 
     $("#lb-close").addEventListener("click", closeLightbox);
     $("#lb-prev").addEventListener("click", () => step(-1));

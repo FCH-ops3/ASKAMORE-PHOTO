@@ -6,9 +6,9 @@
 
 :root{
   /* Beiges */
-  --beige:     #f0e9d8;   /* fond principal */
-  --cream:     #faf6eb;   /* bandes claires, cartes */
-  --beige-2:   #e6dcc4;   /* surfaces d'appui */
+  --beige:     #f6f1e4;   /* fond principal */
+  --cream:     #fcf9f1;   /* bandes claires, cartes */
+  --beige-2:   #ece3cf;   /* surfaces d'appui */
   /* Noirs */
   --noir:      #16130d;
   --noir-2:    #201b12;
@@ -141,7 +141,7 @@ input,select,textarea{font-family:inherit;font-size:1rem;color:inherit}
   transition:background .4s var(--ease),border-color .4s var(--ease);
   border-bottom:1px solid transparent;
 }
-.nav.scrolled{background:rgba(250,246,235,.9);backdrop-filter:blur(14px);border-color:var(--line-gold)}
+.nav.scrolled{background:rgba(252,249,241,.92);backdrop-filter:blur(14px);border-color:var(--line-gold)}
 .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:2rem;padding-block:1rem}
 .brand{font-family:var(--font-display);font-size:1.4rem;letter-spacing:.02em;white-space:nowrap;color:var(--ink)}
 .brand em{font-style:italic;color:var(--champagne)}
@@ -163,7 +163,7 @@ input,select,textarea{font-family:inherit;font-size:1rem;color:inherit}
 .burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
 .mobile-menu{
   display:none;position:fixed;top:0;right:0;left:0;z-index:55;
-  background:rgba(250,246,235,.97);backdrop-filter:blur(16px);
+  background:rgba(252,249,241,.97);backdrop-filter:blur(16px);
   padding:6rem 8vw 3rem;border-bottom:1px solid var(--line-gold);
 }
 .mobile-menu.open{display:block}
@@ -233,11 +233,14 @@ input,select,textarea{font-family:inherit;font-size:1rem;color:inherit}
 #about{position:relative;overflow:hidden}
 #about .container{position:relative;z-index:1}
 .about-mark{
-  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  position:absolute;left:68%;top:50%;transform:translate(-50%,-50%);
   font-family:var(--font-display);font-style:italic;font-weight:500;
-  font-size:clamp(10rem,24vw,20rem);line-height:1;
-  color:var(--champagne);opacity:.08;
+  font-size:clamp(7rem,15vw,13rem);line-height:1;
+  color:var(--champagne);opacity:.09;
   pointer-events:none;user-select:none;z-index:0;white-space:nowrap;
+}
+@media (max-width:820px){
+  .about-mark{left:50%;font-size:clamp(6rem,24vw,10rem)}
 }
 .about-quote{
   font-family:var(--font-display);font-style:italic;font-weight:500;
@@ -411,7 +414,7 @@ input,select,textarea{font-family:inherit;font-size:1rem;color:inherit}
 .to-top{
   position:fixed;right:1.4rem;bottom:1.4rem;z-index:50;
   width:2.9rem;height:2.9rem;display:flex;align-items:center;justify-content:center;
-  background:rgba(250,246,235,.9);border:1px solid var(--line-strong);color:var(--ink);
+  background:rgba(252,249,241,.92);border:1px solid var(--line-strong);color:var(--ink);
   opacity:0;pointer-events:none;transition:opacity .35s,border-color .3s,color .3s;
 }
 .to-top.show{opacity:1;pointer-events:auto}
@@ -438,7 +441,8 @@ input,select,textarea{font-family:inherit;font-size:1rem;color:inherit}
 .page-hero h1 em{font-style:italic;color:var(--champagne)}
 .page-hero .intro{max-width:38rem;color:var(--ink-soft)}
 
-.masonry{columns:2;column-gap:clamp(1rem,2vw,1.5rem)}
+.masonry{columns:2;column-gap:clamp(1rem,2vw,1.5rem);opacity:1;transition:opacity .55s var(--ease)}
+.masonry.loading{opacity:0;min-height:55vh}
 .ph-item{
   position:relative;break-inside:avoid;margin-bottom:clamp(1rem,2vw,1.5rem);
   overflow:hidden;background:var(--cream);border:1px solid var(--line);
@@ -524,7 +528,7 @@ input,select,textarea{font-family:inherit;font-size:1rem;color:inherit}
 .admin-shell.on{display:block}
 .admin-header{
   position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:1rem;
-  padding:1rem 4vw;background:rgba(250,246,235,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line-gold);
+  padding:1rem 4vw;background:rgba(252,249,241,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line-gold);
 }
 .admin-header .actions{display:flex;gap:.7rem;flex-wrap:wrap}
 .admin-layout{display:grid;grid-template-columns:230px 1fr;gap:0;min-height:calc(100vh - 65px)}
