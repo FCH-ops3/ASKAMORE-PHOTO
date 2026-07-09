@@ -98,6 +98,18 @@ window.ASKAMORE = (function () {
     if (error) throw error;
   }
 
+  /* Compte une visite (anonyme : ni cookie, ni identifiant personnel) */
+  function trackVisit() {
+    try {
+      const s = sb();
+      if (!s) return;
+      if (sessionStorage.getItem("askamore_visit")) return;
+      sessionStorage.setItem("askamore_visit", "1");
+      const page = location.pathname.split("/").pop() || "index.html";
+      s.from("visits").insert({ page: page }).then(function () {});
+    } catch (e) { /* jamais bloquant */ }
+  }
+
   function uid() {
     return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
   }
@@ -128,5 +140,5 @@ window.ASKAMORE = (function () {
     });
   }
 
-  return { CATEGORIES, PLACEHOLDERS, sb, emptyContent, loadContent, addReview, uid, compressImage };
+  return { CATEGORIES, PLACEHOLDERS, sb, emptyContent, loadContent, addReview, trackVisit, uid, compressImage };
 })();

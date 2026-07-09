@@ -290,6 +290,7 @@
 
   /* ---------- Démarrage ---------- */
   document.addEventListener("DOMContentLoaded", async () => {
+    try { ASKAMORE.trackVisit(); } catch (e) { /* ignoré */ }
     initIntro();
     initNav();
     initReveal();

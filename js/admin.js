@@ -8,7 +8,7 @@
   const $$ = (sel, root) => Array.from((root || document).querySelectorAll(sel));
 
   let content = ASKAMORE.emptyContent();
-  let activeTab = "about";
+  let activeTab = "dash";
   const sb = () => ASKAMORE.sb();
   const BUCKET = "photos";
 
@@ -95,9 +95,55 @@
   function render() {
     $$(".admin-nav button").forEach(b => b.classList.toggle("active", b.dataset.tab === activeTab));
     $$(".admin-panel").forEach(p => p.style.display = p.dataset.panel === activeTab ? "" : "none");
-    if (activeTab === "about") renderAbout();
+    if (activeTab === "dash") renderDash();
+    else if (activeTab === "about") renderAbout();
     else if (ASKAMORE.CATEGORIES[activeTab]) renderGalleryTab(activeTab);
     else if (activeTab === "avis") renderAvis();
+  }
+
+  /* ---------- Tableau de bord ---------- */
+  function renderDash() {
+    const counts = {
+      mariage: content.photos.mariage.length,
+      fiancailles: content.photos.fiancailles.length,
+      seance: content.photos.seance.length,
+      evenement: content.photos.evenement.length
+    };
+    $("#ph-mariage").textContent = counts.mariage;
+    $("#ph-fiancailles").textContent = counts.fiancailles;
+    $("#ph-seance").textContent = counts.seance;
+    $("#ph-evenement").textContent = counts.evenement;
+    $("#ph-total").textContent = counts.mariage + counts.fiancailles + counts.seance + counts.evenement;
+    $("#n-avis").textContent = content.reviews.length;
+    $("#about-state").textContent = content.aboutPhoto ? "✓" : "—";
+    loadVisitStats();
+  }
+
+  async function loadVisitStats() {
+    const note = $("#visits-note");
+    note.textContent = "";
+    try {
+      const now = new Date();
+      const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+      const d7 = new Date(now.getTime() - 7 * 86400000).toISOString();
+      const d30 = new Date(now.getTime() - 30 * 86400000).toISOString();
+      const q = gte => {
+        let r = sb().from("visits").select("id", { count: "exact", head: true });
+        if (gte) r = r.gte("created_at", gte);
+        return r;
+      };
+      const [t, dj, w, m] = await Promise.all([q(null), q(startToday), q(d7), q(d30)]);
+      if (t.error || dj.error || w.error || m.error) throw (t.error || dj.error || w.error || m.error);
+      $("#v-today").textContent = dj.count || 0;
+      $("#v-week").textContent = w.count || 0;
+      $("#v-month").textContent = m.count || 0;
+      $("#v-total").textContent = t.count || 0;
+      note.textContent = "Comptage anonyme : une visite = un navigateur par session, depuis l'activation du compteur.";
+    } catch (err) {
+      ["v-today", "v-week", "v-month", "v-total"].forEach(id => $("#" + id).textContent = "—");
+      note.textContent = "Compteur non activé : exécutez le script visites.sql dans Supabase (SQL Editor) pour créer la table des visites.";
+      note.style.color = "#b0503c";
+    }
   }
 
   /* ---------- Onglet Accueil : photo « À propos de nous » ---------- */
