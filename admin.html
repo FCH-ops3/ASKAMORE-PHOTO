@@ -45,8 +45,10 @@
 
     <div class="admin-layout">
       <nav class="admin-nav" aria-label="Sections de l'administration">
+        <p class="group">Vue d'ensemble</p>
+        <button data-tab="dash" class="active" type="button">Tableau de bord</button>
         <p class="group">Page d'accueil</p>
-        <button data-tab="about" class="active" type="button">À propos — photo</button>
+        <button data-tab="about" type="button">À propos — photo</button>
         <p class="group">Galeries</p>
         <button data-tab="mariage" type="button">Mariage</button>
         <button data-tab="fiancailles" type="button">Fiançailles</button>
@@ -60,8 +62,38 @@
 
       <main class="admin-main">
 
+        <!-- ===== Tableau de bord ===== -->
+        <section class="admin-panel" data-panel="dash">
+          <h2>Tableau de bord</h2>
+          <p class="lead">Vue d'ensemble de votre site : fréquentation et contenu des galeries.</p>
+
+          <h3>Visites du site</h3>
+          <div class="stat-grid">
+            <div class="stat-card"><span class="num" id="v-today">—</span><span class="lbl">Aujourd'hui</span></div>
+            <div class="stat-card"><span class="num" id="v-week">—</span><span class="lbl">7 derniers jours</span></div>
+            <div class="stat-card"><span class="num" id="v-month">—</span><span class="lbl">30 derniers jours</span></div>
+            <div class="stat-card"><span class="num" id="v-total">—</span><span class="lbl">Total</span></div>
+          </div>
+          <p class="gauge-txt" id="visits-note" style="margin-top:.8rem"></p>
+
+          <h3>Photos par galerie</h3>
+          <div class="stat-grid">
+            <div class="stat-card"><span class="num" id="ph-mariage">0</span><span class="lbl">Mariage</span></div>
+            <div class="stat-card"><span class="num" id="ph-fiancailles">0</span><span class="lbl">Fiançailles</span></div>
+            <div class="stat-card"><span class="num" id="ph-seance">0</span><span class="lbl">Séance photo</span></div>
+            <div class="stat-card"><span class="num" id="ph-evenement">0</span><span class="lbl">Autre événement</span></div>
+          </div>
+
+          <h3>Contenu</h3>
+          <div class="stat-grid">
+            <div class="stat-card"><span class="num" id="ph-total">0</span><span class="lbl">Photos au total</span></div>
+            <div class="stat-card"><span class="num" id="n-avis">0</span><span class="lbl">Avis clients</span></div>
+            <div class="stat-card"><span class="num" id="about-state">—</span><span class="lbl">Photo « À propos »</span></div>
+          </div>
+        </section>
+
         <!-- ===== Accueil : photo À propos ===== -->
-        <section class="admin-panel" data-panel="about">
+        <section class="admin-panel" data-panel="about" style="display:none">
           <h2>Photo « À propos de nous »</h2>
           <p class="lead">Cette photo s'affiche sur la page d'accueil, à côté de votre texte de présentation. Format conseillé : portrait (vertical).</p>
           <div class="about-admin-preview">
