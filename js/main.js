@@ -230,6 +230,7 @@
       const v = id => ($("#" + id) ? $("#" + id).value.trim() : "");
       const name = v("c-name"), email = v("c-email"), type = v("c-type");
       const date = v("c-date"), lieu = v("c-lieu"), msg = v("c-msg");
+      const phone = v("c-phone");
       const btn = form.querySelector('button[type="submit"]');
       btn.disabled = true;
       say("Envoi de votre demande en cours…");
@@ -242,6 +243,7 @@
             _subject: "Demande de renseignement — " + (type || "Prestation"),
             name: name,
             email: email,
+            "Téléphone": phone,
             "Prestation": type,
             "Date de l'événement": date || "Non précisée",
             "Localisation": lieu || "Non précisée",
@@ -258,6 +260,7 @@
         const body =
           "Nom : " + name +
           "\nE-mail : " + email +
+          "\nTéléphone : " + phone +
           "\nPrestation : " + type +
           "\nDate de l'événement : " + date +
           "\nLocalisation : " + lieu +
